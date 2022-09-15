@@ -5,5 +5,5 @@
 
 void error(char *str);
 t_map read_map(char *filename);
-void render(t_map map);
+void window(t_map map);
 #endif

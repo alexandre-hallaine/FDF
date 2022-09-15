@@ -1,4 +1,4 @@
-#include "../include/types.h"
+#include "../include/functions.h"
 
 #include "../minilibx-linux/mlx.h"
 
@@ -7,34 +7,86 @@
 #include <stdio.h>
 #include <X11/X.h>
 #include <math.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
-void draw_dot(t_map map, size_t size_x, size_t size_y, int *data)
+t_dot isometric(t_dot dot, t_dot delta, t_dot scale)
 {
-	size_t scale = 10;
+	t_dot new = {
+		.x = (dot.x - dot.y) * cos(30 * M_PI / 180),
+		.y = (dot.x + dot.y) * sin(30 * M_PI / 180) - dot.z,
+		.z = dot.z};
+	new.x = new.x *scale.x + delta.x;
+	new.y = new.y *scale.y + delta.y;
+	new.z = new.z *scale.z + delta.z;
+	return new;
+}
+
+void draw_dot(t_dot dot, int *data, size_t size_x, size_t size_y)
+{
+	size_t index = dot.y * size_x + dot.x;
+	if (index < size_x * size_y)
+		data[index] = 0x00FFFFFF;
+}
+
+void draw_line(t_dot dot1, t_dot dot2, int *data, size_t size_x, size_t size_y)
+{
+	bool using_x = labs(dot2.x - dot1.x) > labs(dot2.y - dot1.y);
+	if ((using_x && dot1.x > dot2.x) || (!using_x && dot1.y > dot2.y)) 
+		return draw_line(dot2, dot1, data, size_x, size_y);
+
+	if (using_x)
+	{
+		for (ssize_t x = dot1.x; x <= dot2.x; x++)
+			if (dot1.x != dot2.x)
+				draw_dot((t_dot){x, dot1.y + (dot2.y - dot1.y) * (x - dot1.x) / (dot2.x - dot1.x), 0}, data, size_x, size_y);
+	}
+	else
+		for (ssize_t y = dot1.y; y <= dot2.y; y++)
+			if (dot1.y != dot2.y)
+				draw_dot((t_dot){dot1.x + (dot2.x - dot1.x) * (y - dot1.y) / (dot2.y - dot1.y), y, 0}, data, size_x, size_y);
+}
+
+void render(t_map map, size_t size_x, size_t size_y, int *data)
+{
+	t_dot delta = {
+		.x = size_x / 2,
+		.y = size_y / 2};
+	t_dot scale = {
+		.x = size_x / map.width / 4,
+		.y = size_y / map.height / 4,
+		.z = 1};
 
 	for (size_t y = 0; y < map.height; y++)
 		for (size_t x = 0; x < map.width; x++)
 		{
-			ssize_t new_x = (ssize_t)(x - y) * cos(30 * M_PI / 180);
-			ssize_t new_y = (ssize_t)(x + y) * sin(30 * M_PI / 180) - map.data[y * map.width + x];
-			size_t index = (size_y / 2 + new_y * scale) * size_x + (size_x / 2 + new_x * scale);
+			t_dot dot = isometric((t_dot){x, y, map.data[y * map.width + x]}, delta, scale);
+			size_t index = dot.y * size_x + dot.x;
 			if (index < size_x * size_y)
-				data[index] = 0x00FFFFFF;
+				data[index] = 0xFFFFFF;
+			if (x != 0)
+				draw_line(dot, isometric((t_dot){x - 1, y, map.data[y * map.width + x - 1]}, delta, scale), data, size_x, size_y);
+			if (y != 0)
+				draw_line(dot, isometric((t_dot){x, y - 1, map.data[(y - 1) * map.width + x]}, delta, scale), data, size_x, size_y);
+			if (x != map.width - 1)
+				draw_line(dot, isometric((t_dot){x + 1, y, map.data[y * map.width + x + 1]}, delta, scale), data, size_x, size_y);
+			if (y != map.height - 1)
+				draw_line(dot, isometric((t_dot){x, y + 1, map.data[(y + 1) * map.width + x]}, delta, scale), data, size_x, size_y);
 		}
 }
 
-void render(t_map map)
+void window(t_map map)
 {
-	int sizex = 640, sizey = 480;
-	int bpp = 32, size_line = sizex * sizeof(int), endian = 0;
+	int size_x = 640, size_y = 480;
+	int bpp = 32, size_line = size_x * sizeof(int), endian = 0;
 
 	void *mlx = mlx_init();
-	void *win = mlx_new_window(mlx, sizex, sizey, "fdf");
+	void *win = mlx_new_window(mlx, size_x, size_y, "fdf");
 
-	void *img = mlx_new_image(mlx, sizex, sizey);
+	void *img = mlx_new_image(mlx, size_x, size_y);
 	int *data = (int *)mlx_get_data_addr(img, &bpp, &size_line, &endian);
 
-	draw_dot(map, sizex, sizey, data);
+	render(map, size_x, size_y, data);
 
 	mlx_put_image_to_window(mlx, win, img, 0, 0);
 	mlx_destroy_image(mlx, img);
