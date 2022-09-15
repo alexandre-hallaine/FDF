@@ -1,10 +1,12 @@
-#include "../minilibx-linux/mlx.h"
+#include "../include/functions.h"
 
-int main(void)
+#include <stdio.h>
+
+int main(int argc, char **argv)
 {
-    void *mlx = mlx_init();
-    void *win = mlx_new_window(mlx, 500, 500, "Hello World!");
-    mlx_loop(mlx);
-    (void)win;
+    if (argc != 2)
+        error("Usage: ./main <filename>");
+    t_map map = read_map(argv[1]);
+    (void)map;
     return 0;
 }

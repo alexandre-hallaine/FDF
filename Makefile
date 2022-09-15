@@ -1,13 +1,15 @@
 NAME			=	fdf
 
 SOURCE_FOLDER	=	./src
-SOURCES			=	main.c
+SOURCES			=	utils.c \
+					map.c \
+					main.c
 
 OBJECT_FOLDER	=	./obj
 OBJECTS			=	$(SOURCES:%.c=$(OBJECT_FOLDER)/%.o)
 
 INCLUDE_FOLDER	=	./include
-INCLUDES		=	
+INCLUDES		=	functions.h
 
 COMPILER		=	gcc
 
@@ -21,16 +23,14 @@ MLX				=	minilibx-linux
 
 all: $(NAME)
 
-mlx:
+$(MLX):
 	make -C $(MLX)
 
-$(OBJECT_FOLDER):
-	mkdir -p $@
-
 $(OBJECT_FOLDER)/%.o: $(SOURCE_FOLDER)/%.c $(INCLUDES:%.h=$(INCLUDE_FOLDER)/%.h)
+	@mkdir -p $(dir $@)
 	$(COMPILER) $(COMPILER_FLAGS) -c $< -o $@
 
-$(NAME): mlx $(OBJECT_FOLDER) $(OBJECTS)
+$(NAME): $(MLX) $(OBJECTS)
 	$(COMPILER) -o $@ $(OBJECTS) -L$(MLX) -lmlx -lXext -lX11
 
 clean:
