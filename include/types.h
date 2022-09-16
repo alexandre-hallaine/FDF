@@ -4,18 +4,15 @@
 #include <stddef.h>
 #include <sys/types.h>
 
-typedef struct
-{
-	size_t width;
-	size_t height;
+typedef struct s_dot t_dot;
 
-	char *data;
-} t_map;
-
-typedef struct
+struct s_dot
 {
-	ssize_t x;
-	ssize_t y;
-	ssize_t z;
-} t_dot;
+	float x;
+	float y;
+	float z;
+	int color;
+	t_dot *next;
+};
+
 #endif
