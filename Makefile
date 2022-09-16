@@ -3,6 +3,7 @@ NAME			=	fdf
 SOURCE_FOLDER	=	./src
 SOURCES			=	utils.c \
 					map.c \
+					render.c \
 					main.c
 
 OBJECT_FOLDER	=	./obj

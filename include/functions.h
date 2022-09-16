@@ -5,4 +5,5 @@
 
 void error(char *str);
 t_dot *read_map(char *filename);
+void window(t_dot *map);
 #endif
