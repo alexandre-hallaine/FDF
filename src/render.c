@@ -3,16 +3,16 @@
 
 #include <stdbool.h>
 
-void render(t_dot *map, t_dot rotation, size_t size_x, size_t size_y, int *data)
+void render(t_fdf *fdf, int *data)
 {
 	t_dot offset = {
-		.x = size_x / 2,
-		.y = size_y / 2};
-	float zoom = 1;
+		.x = fdf->display.width / 2,
+		.y = fdf->display.height / 2,
+	};
 
-	t_dot *current = map;
-	t_dot *right = find_dot(map, current->x + 1, current->y);
-	t_dot *down = find_dot(map, current->x, current->y + 1);
+	t_dot *current = fdf->map;
+	t_dot *right = find_dot(fdf->map, current->x + 1, current->y);
+	t_dot *down = find_dot(fdf->map, current->x, current->y + 1);
 
 	for (; current; current = current->next)
 	{
@@ -20,48 +20,39 @@ void render(t_dot *map, t_dot rotation, size_t size_x, size_t size_y, int *data)
 		t_dot right_stack = stack_dot(right);
 		t_dot down_stack = stack_dot(down);
 
-		apply_math(&current_stack, rotation, offset, zoom);
-		draw_pixel(data, size_x, size_y, current_stack.x, current_stack.y, current_stack.color);
+		apply_math(&current_stack, fdf->rotation, offset, fdf->scale);
 		if (right)
 		{
-			apply_math(&right_stack, rotation, offset, zoom);
+			apply_math(&right_stack, fdf->rotation, offset, fdf->scale);
 			if (current->y == right->y)
-				dda(data, size_x, size_y, &current_stack, &right_stack);
+				dda(data, fdf->display, &current_stack, &right_stack);
 			right = right->next;
 		}
 		if (down)
 		{
-			apply_math(&down_stack, rotation, offset, zoom);
+			apply_math(&down_stack, fdf->rotation, offset, fdf->scale);
 			if (current->x == down->x)
-				dda(data, size_x, size_y, &current_stack, &down_stack);
+				dda(data, fdf->display, &current_stack, &down_stack);
 			down = down->next;
 		}
 	}
 }
 
-void window(t_dot *map)
+void window(t_fdf *fdf)
 {
-	int size_x = 1200, size_y = 900;
-	int bpp = 32, size_line = size_x * sizeof(int), endian = 0;
-
-	void *mlx = mlx_init();
-	void *win = mlx_new_window(mlx, size_x, size_y, "fdf");
-
-	t_dot rotation = {
-		.x = 0,
-		.y = 0,
-		.z = 0};
-
+	int bpp = 32, size_line = fdf->display.width * sizeof(int), endian = 0;
 	while (true)
 	{
-		void *img = mlx_new_image(mlx, size_x, size_y);
+		void *img = mlx_new_image(fdf->mlx, fdf->display.width, fdf->display.height);
 		int *data = (int *)mlx_get_data_addr(img, &bpp, &size_line, &endian);
 
-		render(map, rotation, size_x, size_y, data);
+		render(fdf, data);
 
-		mlx_put_image_to_window(mlx, win, img, 0, 0);
-		mlx_destroy_image(mlx, img);
+		mlx_put_image_to_window(fdf->mlx, fdf->win, img, 0, 0);
+		mlx_destroy_image(fdf->mlx, img);
 
-		rotation.z += 0.01;
+		fdf->rotation.x += 0.001;
+		fdf->rotation.y += 0.001;
+		fdf->rotation.z += 0.001;
 	}
 }

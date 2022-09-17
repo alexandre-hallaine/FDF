@@ -14,4 +14,23 @@ struct s_dot
 	int color;
 	t_dot *next;
 };
+
+typedef struct
+{
+	size_t width;
+	size_t height;
+} t_display;
+
+typedef struct
+{
+	t_dot *map;
+	float scale;
+
+	t_display display;
+
+	void *mlx;
+	void *win;
+
+	t_dot rotation;
+} t_fdf;
 #endif

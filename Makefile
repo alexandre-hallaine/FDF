@@ -3,6 +3,7 @@ NAME			=	fdf
 SOURCE_FOLDER	=	./src
 SOURCES			=	utils.c \
 					map.c \
+					init.c \
 					dot.c \
 					draw.c \
 					math.c \
