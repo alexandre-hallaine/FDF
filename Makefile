@@ -20,7 +20,7 @@ INCLUDES		=	functions.h \
 COMPILER		=	gcc
 
 COMPILER_FLAGS	=	-I$(INCLUDE_FOLDER)
-COMPILER_FLAGS	+=	-Wall -Wextra
+COMPILER_FLAGS	+=	-Wall -Wextra -Werror
 # COMPILER_FLAGS	+=	-g3
 
 FLAGS			=	test_maps/42.fdf

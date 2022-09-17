@@ -1,10 +1,7 @@
 #include "../include/types.h"
 #include "../minilibx-linux/mlx.h"
 
-#define WIDTH 1200
-#define HEIGHT 900
-
-float center_map(t_dot *map)
+float center_map(t_dot *map, t_display display)
 {
 	float x_min = 0, x_max = 0;
 	float y_min = 0, y_max = 0;
@@ -37,26 +34,30 @@ float center_map(t_dot *map)
 		dot->z -= z_center;
 	}
 
-	float scale_x = WIDTH / (x_max - x_min);
-	float scale_y = HEIGHT / (y_max - y_min);
+	float scale_x = display.width / (x_max - x_min);
+	float scale_y = display.height / (y_max - y_min);
 	float scale = scale_x < scale_y ? scale_x : scale_y;
 	return scale / 2;
 }
 
 t_fdf init(t_dot *map)
 {
-	float scale = center_map(map);
+	t_display display = {
+		.width = 1200,
+		.height = 900,
+	};
+
 	void *mlx = mlx_init();
+	mlx_get_screen_size(mlx, (int *)&display.width, (int *)&display.height);
+
+	float scale = center_map(map, display);
 
 	t_fdf fdf = {
 		.map = map,
 		.scale = scale,
-		.display = {
-			.width = WIDTH,
-			.height = HEIGHT,
-		},
+		.display = display,
 		.mlx = mlx,
-		.win = mlx_new_window(mlx, WIDTH, HEIGHT, "FDF"),
+		.win = mlx_new_window(mlx, display.width, display.height, "fdf"),
 		.rotation = {
 			.x = 0,
 			.y = 0,
