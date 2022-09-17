@@ -2,6 +2,7 @@
 #include "../minilibx-linux/mlx.h"
 
 #include <stdbool.h>
+#include <time.h>
 
 void render(t_fdf *fdf, int *data)
 {
@@ -43,6 +44,8 @@ void window(t_fdf *fdf)
 	int bpp = 32, size_line = fdf->display.width * sizeof(int), endian = 0;
 	while (true)
 	{
+		clock_t begin = clock();
+
 		void *img = mlx_new_image(fdf->mlx, fdf->display.width, fdf->display.height);
 		int *data = (int *)mlx_get_data_addr(img, &bpp, &size_line, &endian);
 
@@ -51,8 +54,10 @@ void window(t_fdf *fdf)
 		mlx_put_image_to_window(fdf->mlx, fdf->win, img, 0, 0);
 		mlx_destroy_image(fdf->mlx, img);
 
-		fdf->rotation.x += 0.001;
-		fdf->rotation.y += 0.001;
-		fdf->rotation.z += 0.001;
+		clock_t end = clock();
+		double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+		fdf->rotation.x += time_spent;
+		fdf->rotation.y += time_spent;
+		fdf->rotation.z += time_spent;
 	}
 }
