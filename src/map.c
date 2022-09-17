@@ -32,12 +32,9 @@ void update_data(t_dot *dot, bool is_color, bool is_hexa, bool is_negatif, char 
 		dot->z = nbr;
 }
 
-t_dot *get_dot(int fd)
+t_dot *get_dot(int fd, char *c)
 {
 	static size_t x = 0, y = 0;
-	char *c = malloc(sizeof(char));
-	if (c == NULL)
-		return NULL;
 
 	while (true)
 	{
@@ -86,12 +83,17 @@ t_dot *read_map(char *filename)
 	if (fd == -1)
 		error("Error: open() failed");
 
-	t_dot *first = get_dot(fd);
+	char *c = malloc(sizeof(char));
+	if (c == NULL)
+		return NULL;
+
+	t_dot *first = get_dot(fd, c);
 	t_dot *current = first;
 	if (current)
-		while ((current->next = get_dot(fd)))
+		while ((current->next = get_dot(fd, c)))
 			current = current->next;
 
 	close(fd);
+	free(c);
 	return first;
 }

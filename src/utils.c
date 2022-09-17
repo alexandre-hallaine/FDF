@@ -3,6 +3,6 @@
 
 void error(char *str)
 {
-    dprintf(2, "%s\n", str);
-    exit(1);
+	dprintf(2, "%s\n", str);
+	exit(1);
 }

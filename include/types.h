@@ -15,4 +15,11 @@ struct s_dot
 	t_dot *next;
 };
 
+typedef struct
+{
+	float x;
+	float y;
+	float z;
+} t_rotation;
+
 #endif

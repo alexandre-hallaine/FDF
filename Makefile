@@ -3,6 +3,7 @@ NAME			=	fdf
 SOURCE_FOLDER	=	./src
 SOURCES			=	utils.c \
 					map.c \
+					rotation.c \
 					render.c \
 					main.c
 
@@ -25,14 +26,14 @@ MLX				=	minilibx-linux
 
 all: $(NAME)
 
-$(MLX):
+mlx:
 	make -C $(MLX)
 
 $(OBJECT_FOLDER)/%.o: $(SOURCE_FOLDER)/%.c $(INCLUDES:%.h=$(INCLUDE_FOLDER)/%.h)
 	@mkdir -p $(dir $@)
 	$(COMPILER) $(COMPILER_FLAGS) -c $< -o $@
 
-$(NAME): $(MLX) $(OBJECTS)
+$(NAME): mlx $(OBJECTS)
 	$(COMPILER) -o $@ $(OBJECTS) -L$(MLX) -lmlx -lXext -lX11 -lm
 
 clean:
