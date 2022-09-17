@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #define hexa "0123456789abcdef"
 #define HEXA "0123456789ABCDEF"

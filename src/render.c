@@ -1,44 +1,41 @@
 #include "../include/functions.h"
 #include "../minilibx-linux/mlx.h"
 
-#include <stdio.h>
-#include <math.h>
 #include <stdbool.h>
 
-t_dot stack_dot(t_dot *dot)
-{
-	t_dot new_dot = {
-		.x = dot->x,
-		.y = dot->y,
-		.z = dot->z,
-		.color = dot->color,
-		.next = NULL};
-	return new_dot;
-}
 
-void isometri(t_dot *dot)
-{
-	float x = dot->x;
-	float y = dot->y;
-	dot->x = (x - y) * cos(30 * M_PI / 180);
-	dot->y = -dot->z + (x + y) * sin(30 * M_PI / 180);
-}
-
-void render(t_dot *map, t_rotation rotation, size_t size_x, size_t size_y, int *data)
+void render(t_dot *map, t_dot *rotation, size_t size_x, size_t size_y, int *data)
 {
 	t_dot delta = {
 		.x = size_x / 2,
 		.y = size_y / 2};
-	t_dot scale = {
-		.x = 1,
-		.y = 1};
+	float zoom = 10;
 
-	for (t_dot *dot = map; dot; dot = dot->next)
+	t_dot *current = map;
+	t_dot *right = find_dot(map, current->x + 1, current->y);
+	t_dot *down = find_dot(map, current->x, current->y + 1);
+
+	for (; current; current = current->next)
 	{
-		t_dot tmp = stack_dot(dot);
-		rotate(&tmp, rotation);
-		isometri(&tmp);
-		draw_dot(data, size_x, size_y, tmp.x * scale.x + delta.x, tmp.y * scale.y + delta.y, tmp.color);
+		t_dot current_stack = stack_dot(current);
+		t_dot right_stack = stack_dot(right);
+		t_dot down_stack = stack_dot(down);
+
+		apply_math(&current_stack, rotation, &delta, zoom);
+		if (right)
+		{
+			apply_math(&right_stack, rotation, &delta, zoom);
+			if (current->y == right->y)
+				dda(data, size_x, size_y, &current_stack, &right_stack);
+			right = right->next;
+		}
+		if (down)
+		{
+			apply_math(&down_stack, rotation, &delta, zoom);
+			if (current->x == down->x)
+				dda(data, size_x, size_y, &current_stack, &down_stack);
+			down = down->next;
+		}
 	}
 }
 
@@ -50,7 +47,7 @@ void window(t_dot *map)
 	void *mlx = mlx_init();
 	void *win = mlx_new_window(mlx, size_x, size_y, "fdf");
 
-	t_rotation rotation = {
+	t_dot rotation = {
 		.x = 0,
 		.y = 0,
 		.z = 0};
@@ -59,12 +56,12 @@ void window(t_dot *map)
 	{
 		void *img = mlx_new_image(mlx, size_x, size_y);
 		int *data = (int *)mlx_get_data_addr(img, &bpp, &size_line, &endian);
-		render(map, rotation, size_x, size_y, data);
+
+		render(map, &rotation, size_x, size_y, data);
+
 		mlx_put_image_to_window(mlx, win, img, 0, 0);
 		mlx_destroy_image(mlx, img);
 
-		rotation.x += 0.005;
-		rotation.y += 0.005;
-		rotation.z += 0.01;
+		rotation.z += 0.001;
 	}
 }

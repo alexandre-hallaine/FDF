@@ -7,9 +7,13 @@ void error(char *str);
 
 t_dot *read_map(char *filename);
 
-void rotate(t_dot *dot, t_rotation rotation);
+t_dot stack_dot(t_dot *dot);
+t_dot *find_dot(t_dot *dot, size_t x, size_t y);
 
-void draw_dot(int *data, size_t size_x, size_t size_y, size_t x, size_t y, int color);
+void apply_math(t_dot *dot, t_dot *rotation, t_dot *offset, float zoom);
+
+void draw_pixel(int *data, size_t size_x, size_t size_y, size_t x, size_t y, int color);
+void dda(int *data, size_t size_x, size_t size_y, t_dot *dot1, t_dot *dot2);
 
 void window(t_dot *map);
 #endif
