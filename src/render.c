@@ -3,13 +3,12 @@
 
 #include <stdbool.h>
 
-
-void render(t_dot *map, t_dot *rotation, size_t size_x, size_t size_y, int *data)
+void render(t_dot *map, t_dot rotation, size_t size_x, size_t size_y, int *data)
 {
-	t_dot delta = {
+	t_dot offset = {
 		.x = size_x / 2,
 		.y = size_y / 2};
-	float zoom = 10;
+	float zoom = 1;
 
 	t_dot *current = map;
 	t_dot *right = find_dot(map, current->x + 1, current->y);
@@ -21,17 +20,18 @@ void render(t_dot *map, t_dot *rotation, size_t size_x, size_t size_y, int *data
 		t_dot right_stack = stack_dot(right);
 		t_dot down_stack = stack_dot(down);
 
-		apply_math(&current_stack, rotation, &delta, zoom);
+		apply_math(&current_stack, rotation, offset, zoom);
+		draw_pixel(data, size_x, size_y, current_stack.x, current_stack.y, current_stack.color);
 		if (right)
 		{
-			apply_math(&right_stack, rotation, &delta, zoom);
+			apply_math(&right_stack, rotation, offset, zoom);
 			if (current->y == right->y)
 				dda(data, size_x, size_y, &current_stack, &right_stack);
 			right = right->next;
 		}
 		if (down)
 		{
-			apply_math(&down_stack, rotation, &delta, zoom);
+			apply_math(&down_stack, rotation, offset, zoom);
 			if (current->x == down->x)
 				dda(data, size_x, size_y, &current_stack, &down_stack);
 			down = down->next;
@@ -57,11 +57,11 @@ void window(t_dot *map)
 		void *img = mlx_new_image(mlx, size_x, size_y);
 		int *data = (int *)mlx_get_data_addr(img, &bpp, &size_line, &endian);
 
-		render(map, &rotation, size_x, size_y, data);
+		render(map, rotation, size_x, size_y, data);
 
 		mlx_put_image_to_window(mlx, win, img, 0, 0);
 		mlx_destroy_image(mlx, img);
 
-		rotation.z += 0.001;
+		rotation.z += 0.01;
 	}
 }

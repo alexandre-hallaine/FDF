@@ -13,7 +13,7 @@ t_dot stack_dot(t_dot *dot)
 	return new_dot;
 }
 
-t_dot *find_dot(t_dot *dot, size_t x, size_t y)
+t_dot *find_dot(t_dot *dot, float x, float y)
 {
 	for (t_dot *tmp = dot; tmp; tmp = tmp->next)
 		if (tmp->x == x && tmp->y == y)

@@ -13,7 +13,7 @@ void dda(int *data, size_t size_x, size_t size_y, t_dot *dot1, t_dot *dot2)
 {
 	t_dot tmp1 = stack_dot(dot1);
 	t_dot tmp2 = stack_dot(dot2);
-	
+
 	t_dot delta = {
 		.x = tmp2.x - tmp1.x,
 		.y = tmp2.y - tmp1.y};

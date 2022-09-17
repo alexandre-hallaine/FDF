@@ -14,5 +14,4 @@ struct s_dot
 	int color;
 	t_dot *next;
 };
-
 #endif
