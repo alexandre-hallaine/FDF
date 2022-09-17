@@ -4,6 +4,7 @@ SOURCE_FOLDER	=	./src
 SOURCES			=	utils.c \
 					map.c \
 					rotation.c \
+					draw.c \
 					render.c \
 					main.c
 

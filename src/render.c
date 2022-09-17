@@ -5,21 +5,23 @@
 #include <math.h>
 #include <stdbool.h>
 
-void draw_dot(int *data, size_t size_x, size_t size_y, size_t x, size_t y, int color)
+t_dot stack_dot(t_dot *dot)
 {
-	size_t index = y * size_x + x;
-	if (index < size_x * size_y)
-		data[index] = color;
+	t_dot new_dot = {
+		.x = dot->x,
+		.y = dot->y,
+		.z = dot->z,
+		.color = dot->color,
+		.next = NULL};
+	return new_dot;
 }
 
-t_dot isometric(t_dot *dot, t_rotation rotation)
+void isometri(t_dot *dot)
 {
-	t_dot rotated_dot = rotate(*dot, rotation);
-	t_dot new_dot = {
-		.x = (rotated_dot.x - rotated_dot.y) * cos(30 * M_PI / 180),
-		.y = -rotated_dot.z + (rotated_dot.x + rotated_dot.y) * sin(30 * M_PI / 180),
-		.color = rotated_dot.color};
-	return new_dot;
+	float x = dot->x;
+	float y = dot->y;
+	dot->x = (x - y) * cos(30 * M_PI / 180);
+	dot->y = -dot->z + (x + y) * sin(30 * M_PI / 180);
 }
 
 void render(t_dot *map, t_rotation rotation, size_t size_x, size_t size_y, int *data)
@@ -33,8 +35,10 @@ void render(t_dot *map, t_rotation rotation, size_t size_x, size_t size_y, int *
 
 	for (t_dot *dot = map; dot; dot = dot->next)
 	{
-		t_dot iso_dot = isometric(dot, rotation);
-		draw_dot(data, size_x, size_y, iso_dot.x * scale.x + delta.x, iso_dot.y * scale.y + delta.y, iso_dot.color);
+		t_dot tmp = stack_dot(dot);
+		rotate(&tmp, rotation);
+		isometri(&tmp);
+		draw_dot(data, size_x, size_y, tmp.x * scale.x + delta.x, tmp.y * scale.y + delta.y, tmp.color);
 	}
 }
 

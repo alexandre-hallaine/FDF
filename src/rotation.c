@@ -1,40 +1,33 @@
 #include "../include/types.h"
 #include <math.h>
 
-t_dot rotate_x(t_dot dot, float angle)
+void rotate_x(t_dot *dot, float angle)
 {
-	t_dot new_dot = {
-		.x = dot.x,
-		.y = dot.y * cos(angle) + dot.z * sin(angle),
-		.z = -dot.y * sin(angle) + dot.z * cos(angle),
-		.color = dot.color};
-	return new_dot;
+	float y = dot->y;
+	float z = dot->z;
+	dot->y = y * cos(angle) + z * sin(angle);
+	dot->z = -y * sin(angle) + z * cos(angle);
 }
 
-t_dot rotate_y(t_dot dot, float angle)
+void rotate_y(t_dot *dot, float angle)
 {
-	t_dot new_dot = {
-		.x = dot.x * cos(angle) + dot.z * sin(angle),
-		.y = dot.y,
-		.z = -dot.x * sin(angle) + dot.z * cos(angle),
-		.color = dot.color};
-	return new_dot;
+	float x = dot->x;
+	float z = dot->z;
+	dot->x = x * cos(angle) - z * sin(angle);
+	dot->z = x * sin(angle) + z * cos(angle);
 }
 
-t_dot rotate_z(t_dot dot, float angle)
+void rotate_z(t_dot *dot, float angle)
 {
-	t_dot new_dot = {
-		.x = dot.x * cos(angle) - dot.y * sin(angle),
-		.y = dot.x * sin(angle) + dot.y * cos(angle),
-		.z = dot.z,
-		.color = dot.color};
-	return new_dot;
+	float x = dot->x;
+	float y = dot->y;
+	dot->x = x * cos(angle) + y * sin(angle);
+	dot->y = -x * sin(angle) + y * cos(angle);
 }
 
-t_dot rotate(t_dot dot, t_rotation rotation)
+void rotate(t_dot *dot, t_rotation rotation)
 {
-	t_dot rotated_dot = rotate_x(dot, rotation.x);
-	rotated_dot = rotate_y(rotated_dot, rotation.y);
-	rotated_dot = rotate_z(rotated_dot, rotation.z);
-	return rotated_dot;
+	rotate_x(dot, rotation.x);
+	rotate_y(dot, rotation.y);
+	rotate_z(dot, rotation.z);
 }
