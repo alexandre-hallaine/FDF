@@ -5,9 +5,9 @@
 
 void error(char *str);
 
+float get_scale(t_dot *map, t_display display);
 t_dot *read_map(char *filename);
-
-t_fdf init(t_dot *map);
+free_map(t_dot *map);
 
 t_dot stack_dot(t_dot *dot);
 t_dot *find_dot(t_dot *dot, float x, float y);

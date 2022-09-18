@@ -29,6 +29,7 @@ typedef struct
 	float scale;
 
 	t_display display;
+	t_dot offset;
 	t_dot rotation;
 
 	mlx_t *mlx;
