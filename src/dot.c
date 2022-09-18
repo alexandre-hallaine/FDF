@@ -1,4 +1,4 @@
-#include "../include/functions.h"
+#include "functions.h"
 
 t_dot stack_dot(t_dot *dot)
 {

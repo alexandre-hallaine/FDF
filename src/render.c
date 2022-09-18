@@ -1,10 +1,8 @@
-#include "../include/functions.h"
-#include "../minilibx-linux/mlx.h"
+#include "functions.h"
 
 #include <stdbool.h>
-#include <time.h>
 
-void render(t_fdf *fdf, int *data)
+void render(t_fdf *fdf)
 {
 	t_dot offset = {
 		.x = fdf->display.width / 2,
@@ -26,38 +24,31 @@ void render(t_fdf *fdf, int *data)
 		{
 			apply_math(&right_stack, fdf->rotation, offset, fdf->scale);
 			if (current->y == right->y)
-				dda(data, fdf->display, &current_stack, &right_stack);
+				dda(fdf->img, fdf->display, &current_stack, &right_stack);
 			right = right->next;
 		}
 		if (down)
 		{
 			apply_math(&down_stack, fdf->rotation, offset, fdf->scale);
 			if (current->x == down->x)
-				dda(data, fdf->display, &current_stack, &down_stack);
+				dda(fdf->img, fdf->display, &current_stack, &down_stack);
 			down = down->next;
 		}
 	}
 }
 
-void window(t_fdf *fdf)
+void loop(void *fdf)
 {
-	int bpp = 32, size_line = fdf->display.width * sizeof(int), endian = 0;
-	while (true)
-	{
-		clock_t begin = clock();
+	t_fdf *fdf_ptr = (t_fdf *)fdf;
+	if (fdf_ptr->img)
+		mlx_delete_image(fdf_ptr->mlx, fdf_ptr->img);
 
-		void *img = mlx_new_image(fdf->mlx, fdf->display.width, fdf->display.height);
-		int *data = (int *)mlx_get_data_addr(img, &bpp, &size_line, &endian);
+	fdf_ptr->img = mlx_new_image(fdf_ptr->mlx, fdf_ptr->display.width, fdf_ptr->display.height);
+	mlx_image_to_window(fdf_ptr->mlx, fdf_ptr->img, 0, 0);
 
-		render(fdf, data);
+	render(fdf_ptr);
 
-		mlx_put_image_to_window(fdf->mlx, fdf->win, img, 0, 0);
-		mlx_destroy_image(fdf->mlx, img);
-
-		clock_t end = clock();
-		double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-		fdf->rotation.x += time_spent;
-		fdf->rotation.y += time_spent;
-		fdf->rotation.z += time_spent;
-	}
+	fdf_ptr->rotation.x += 0.005;
+	fdf_ptr->rotation.y += 0.005;
+	fdf_ptr->rotation.z += 0.005;
 }

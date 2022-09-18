@@ -1,5 +1,4 @@
-#include "../include/types.h"
-#include "../minilibx-linux/mlx.h"
+#include "types.h"
 
 float center_map(t_dot *map, t_display display)
 {
@@ -46,23 +45,20 @@ t_fdf init(t_dot *map)
 		.width = 1200,
 		.height = 900,
 	};
-
-	void *mlx = mlx_init();
-	mlx_get_screen_size(mlx, (int *)&display.width, (int *)&display.height);
-
 	float scale = center_map(map, display);
 
 	t_fdf fdf = {
 		.map = map,
 		.scale = scale,
+
 		.display = display,
-		.mlx = mlx,
-		.win = mlx_new_window(mlx, display.width, display.height, "fdf"),
 		.rotation = {
 			.x = 0,
 			.y = 0,
 			.z = 0,
 		},
+
+		.mlx = mlx_init(display.width, display.height, "FDF", false),
 	};
 	return fdf;
 }

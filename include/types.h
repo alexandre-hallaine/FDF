@@ -1,6 +1,8 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include "MLX42/MLX42.h"
+
 #include <stddef.h>
 #include <sys/types.h>
 
@@ -27,10 +29,9 @@ typedef struct
 	float scale;
 
 	t_display display;
-
-	void *mlx;
-	void *win;
-
 	t_dot rotation;
+
+	mlx_t *mlx;
+	mlx_image_t *img;
 } t_fdf;
 #endif

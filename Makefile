@@ -1,53 +1,35 @@
-NAME			=	fdf
+NAME	:= fdf
+CFLAGS	:= -Wextra -Wall -Werror -Wunreachable-code -Ofast
+LIBMLX	:= ./lib/MLX42
 
-SOURCE_FOLDER	=	./src
-SOURCES			=	utils.c \
-					map.c \
-					init.c \
-					dot.c \
-					draw.c \
-					math.c \
-					render.c \
-					main.c
+HEADERS	:= -I ./include -I $(LIBMLX)/include
+LIBS	:= $(LIBMLX)/libmlx42.a -ldl -lglfw -pthread -lm
+SRCDIR	:= ./src
+OBJDIR	:= ./obj
+SRCS	:= $(shell cd $(SRCDIR) && find . -name "*.c")
+OBJS	:= $(SRCS:%.c=$(OBJDIR)/%.o)
 
-OBJECT_FOLDER	=	./obj
-OBJECTS			=	$(SOURCES:%.c=$(OBJECT_FOLDER)/%.o)
+all: libmlx $(NAME)
 
-INCLUDE_FOLDER	=	./include
-INCLUDES		=	functions.h \
-					types.h
+libmlx:
+	$(MAKE) -C $(LIBMLX)
 
-COMPILER		=	gcc
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS) && echo "Compiling: $(notdir $<)"
 
-COMPILER_FLAGS	=	-I$(INCLUDE_FOLDER)
-COMPILER_FLAGS	+=	-Wall -Wextra -Werror
-# COMPILER_FLAGS	+=	-g3
-
-FLAGS			=	test_maps/42.fdf
-
-MLX				=	minilibx-linux
-
-all: $(NAME)
-
-mlx:
-	make -C $(MLX)
-
-$(OBJECT_FOLDER)/%.o: $(SOURCE_FOLDER)/%.c $(INCLUDES:%.h=$(INCLUDE_FOLDER)/%.h)
-	@mkdir -p $(dir $@)
-	$(COMPILER) $(COMPILER_FLAGS) -c $< -o $@
-
-$(NAME): mlx $(OBJECTS)
-	$(COMPILER) -o $@ $(OBJECTS) -L$(MLX) -lmlx -lXext -lX11 -lm
+$(NAME): $(OBJS)
+	$(CC) $(OBJS) $(LIBS) $(HEADERS) -o $(NAME)
 
 clean:
-	rm -rf $(OBJECT_FOLDER)
+	rm -rf $(OBJDIR)
+	$(MAKE) -C $(LIBMLX) clean
 
 fclean: clean
-	rm -rf $(NAME)
+	rm -f $(NAME)
+	$(MAKE) -C $(LIBMLX) fclean
 
-re: fclean all
+re: clean all
 
-run: $(NAME)
-	./$(NAME) $(FLAGS)
-
-.PHONY: all clean fclean re run
+.PHONY: all, clean, fclean, re, libmlx
+.SILENT:
