@@ -11,32 +11,35 @@ void render(t_fdf *fdf)
 	for (; current; current = current->next)
 	{
 		t_dot current_stack = stack_dot(current);
-		t_dot right_stack = stack_dot(right);
-		t_dot down_stack = stack_dot(down);
 
 		apply_math(&current_stack, fdf->rotation, fdf->offset, fdf->scale);
-		if (right)
+		if (fdf->lines)
 		{
-			apply_math(&right_stack, fdf->rotation, fdf->offset, fdf->scale);
-			if (current->y == right->y)
-				dda(fdf->img, fdf->display, &current_stack, &right_stack);
-			right = right->next;
+			if (right)
+			{
+				t_dot right_stack = stack_dot(right);
+				apply_math(&right_stack, fdf->rotation, fdf->offset, fdf->scale);
+				if (current->y == right->y)
+					dda(fdf->img, fdf->display, &current_stack, &right_stack);
+				right = right->next;
+			}
+			if (down)
+			{
+				t_dot down_stack = stack_dot(down);
+				apply_math(&down_stack, fdf->rotation, fdf->offset, fdf->scale);
+				if (current->x == down->x)
+					dda(fdf->img, fdf->display, &current_stack, &down_stack);
+				down = down->next;
+			}
 		}
-		if (down)
-		{
-			apply_math(&down_stack, fdf->rotation, fdf->offset, fdf->scale);
-			if (current->x == down->x)
-				dda(fdf->img, fdf->display, &current_stack, &down_stack);
-			down = down->next;
-		}
+		else if (current_stack.x >= 0 && current_stack.x < fdf->display.width &&
+				 current_stack.y >= 0 && current_stack.y < fdf->display.height)
+			mlx_put_pixel(fdf->img, current_stack.x, current_stack.y, (current_stack.color & 0xFFFFFF) << 8 | 0xFF);
 	}
 }
 
 bool check_key(t_fdf *fdf)
 {
-	if (mlx_is_key_down(fdf->mlx, MLX_KEY_ESCAPE))
-		mlx_close_window(fdf->mlx);
-
 	t_dot old_rotation = fdf->rotation;
 	t_dot old_offset = fdf->offset;
 	float old_scale = fdf->scale;

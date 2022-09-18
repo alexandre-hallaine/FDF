@@ -30,6 +30,7 @@ typedef struct
 	t_display display;
 	t_dot offset;
 	t_dot rotation;
+	bool lines;
 
 	mlx_t *mlx;
 	mlx_image_t *img;

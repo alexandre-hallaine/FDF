@@ -18,8 +18,9 @@ void dda(mlx_image_t *img, t_display display, t_dot *dot1, t_dot *dot2)
 
 	for (size_t i = 0; i <= step; i++)
 	{
-		if (tmp1.x >= 0 && tmp1.x < display.width && tmp1.y >= 0 && tmp1.y < display.height)
-			mlx_put_pixel(img, tmp1.x, tmp1.y, tmp1.color << 8 | 0xFF);
+		if (tmp1.x >= 0 && tmp1.x < display.width &&
+			tmp1.y >= 0 && tmp1.y < display.height)
+			mlx_put_pixel(img, tmp1.x, tmp1.y, (tmp1.color & 0xFFFFFF) << 8 | 0xFF);
 
 		tmp1.x += delta.x;
 		tmp1.y += delta.y;
