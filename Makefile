@@ -1,5 +1,5 @@
 NAME	:= fdf
-CFLAGS	:= -Wextra -Wall -Wunreachable-code -Ofast
+CFLAGS	:= -Wall -Wextra -Werror -Wunreachable-code -Ofast
 LIBMLX	:= ./lib/MLX42
 
 HEADERS	:= -I ./include -I $(LIBMLX)/include

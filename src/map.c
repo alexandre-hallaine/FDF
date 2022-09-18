@@ -1,7 +1,6 @@
 #include "functions.h"
 
 #include <fcntl.h>
-#include <stdbool.h>
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -150,7 +149,7 @@ t_dot *read_map(char *filename)
 	return first;
 }
 
-free_map(t_dot *map)
+void free_map(t_dot *map)
 {
 	t_dot *next;
 	while (map)

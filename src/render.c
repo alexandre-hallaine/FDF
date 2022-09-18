@@ -32,8 +32,14 @@ void render(t_fdf *fdf)
 	}
 }
 
-void check_key(t_fdf *fdf)
+bool check_key(t_fdf *fdf)
 {
+	if (mlx_is_key_down(fdf->mlx, MLX_KEY_ESCAPE))
+		mlx_close_window(fdf->mlx);
+
+	t_dot old_rotation = fdf->rotation;
+	t_dot old_offset = fdf->offset;
+	float old_scale = fdf->scale;
 
 	if (mlx_is_key_down(fdf->mlx, MLX_KEY_W))
 		fdf->rotation.x += 0.05;
@@ -72,19 +78,27 @@ void check_key(t_fdf *fdf)
 		fdf->scale = get_scale(fdf->map, fdf->display);
 	}
 
-	if (mlx_is_key_down(fdf->mlx, MLX_KEY_ESCAPE))
-		mlx_close_window(fdf->mlx);
+	if (old_rotation.x != fdf->rotation.x ||
+		old_rotation.y != fdf->rotation.y ||
+		old_rotation.z != fdf->rotation.z ||
+		old_offset.x != fdf->offset.x ||
+		old_offset.y != fdf->offset.y ||
+		old_scale != fdf->scale)
+		return (true);
+	return (false);
 }
 
 void loop(void *fdf)
 {
 	t_fdf *fdf_ptr = (t_fdf *)fdf;
 	if (fdf_ptr->img)
+	{
+		if (!check_key(fdf_ptr))
+			return;
 		mlx_delete_image(fdf_ptr->mlx, fdf_ptr->img);
+	}
 
 	fdf_ptr->img = mlx_new_image(fdf_ptr->mlx, fdf_ptr->display.width, fdf_ptr->display.height);
 	mlx_image_to_window(fdf_ptr->mlx, fdf_ptr->img, 0, 0);
-
-	check_key(fdf_ptr);
 	render(fdf_ptr);
 }

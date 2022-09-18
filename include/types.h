@@ -4,7 +4,6 @@
 #include "MLX42/MLX42.h"
 
 #include <stddef.h>
-#include <sys/types.h>
 
 typedef struct s_dot t_dot;
 
