@@ -1,4 +1,4 @@
-#include "types.h"
+#include "functions.h"
 
 #include <math.h>
 
@@ -44,10 +44,65 @@ void isometri(t_dot *dot)
 	dot->y = -dot->z + (x + y) * sin(30 * M_PI / 180);
 }
 
-void apply_math(t_dot *dot, t_dot rotation, t_dot offset, float zoom)
+int get_color(float z, float scale)
 {
+	float max = 300 / scale;
+	float min = -300 / scale;
+
+	if (z > max)
+		z = max;
+	if (z < min)
+		z = min;
+
+	float ratio = (z - min) / (max - min);
+	unsigned char r = 255 * ratio;
+	unsigned char g = 255 * (1 - ratio);
+	unsigned char b = 255;
+	return (r << 16) | (g << 8) | b;
+}
+
+void update_dot(t_dot *dot, t_dot rotation, t_dot offset, float zoom, bool true_color)
+{
+	if (true_color)
+		dot->color = get_color(dot->z, zoom);
+
 	rotate(dot, rotation);
 	isometri(dot);
 	dot->x = dot->x * zoom + offset.x;
 	dot->y = dot->y * zoom + offset.y;
+}
+
+void render(t_fdf *fdf)
+{
+	t_dot *current = fdf->map;
+	t_dot *right = find_dot(fdf->map, current->x + 1, current->y);
+	t_dot *down = find_dot(fdf->map, current->x, current->y + 1);
+
+	for (; current; current = current->next)
+	{
+		t_dot current_stack = stack_dot(current);
+		update_dot(&current_stack, fdf->rotation, fdf->offset, fdf->scale, fdf->true_color);
+		if (fdf->lines)
+		{
+			if (right)
+			{
+				t_dot right_stack = stack_dot(right);
+				update_dot(&right_stack, fdf->rotation, fdf->offset, fdf->scale, fdf->true_color);
+				if (current->y == right->y)
+					dda(fdf->img, fdf->display, &current_stack, &right_stack);
+				right = right->next;
+			}
+			if (down)
+			{
+				t_dot down_stack = stack_dot(down);
+				update_dot(&down_stack, fdf->rotation, fdf->offset, fdf->scale, fdf->true_color);
+				if (current->x == down->x)
+					dda(fdf->img, fdf->display, &current_stack, &down_stack);
+				down = down->next;
+			}
+		}
+		else if (current_stack.x >= 0 && current_stack.x < fdf->display.width &&
+				 current_stack.y >= 0 && current_stack.y < fdf->display.height)
+			mlx_put_pixel(fdf->img, current_stack.x, current_stack.y, current_stack.color << 8 | 0xFF);
+	}
 }

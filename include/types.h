@@ -31,6 +31,7 @@ typedef struct
 	t_dot offset;
 	t_dot rotation;
 	bool lines;
+	bool true_color;
 
 	mlx_t *mlx;
 	mlx_image_t *img;

@@ -2,39 +2,33 @@
 
 #include <stdbool.h>
 
-void render(t_fdf *fdf)
+void key_hook(mlx_key_data_t keydata, void *fdf)
 {
-	t_dot *current = fdf->map;
-	t_dot *right = find_dot(fdf->map, current->x + 1, current->y);
-	t_dot *down = find_dot(fdf->map, current->x, current->y + 1);
+	if (keydata.action != MLX_RELEASE)
+		return;
 
-	for (; current; current = current->next)
+	t_fdf *fdf_ptr = (t_fdf *)fdf;
+
+	if (keydata.key == MLX_KEY_ESCAPE)
+		mlx_close_window(fdf_ptr->mlx);
+	else if (keydata.key == MLX_KEY_L)
 	{
-		t_dot current_stack = stack_dot(current);
+		fdf_ptr->lines = !fdf_ptr->lines;
 
-		apply_math(&current_stack, fdf->rotation, fdf->offset, fdf->scale);
-		if (fdf->lines)
-		{
-			if (right)
-			{
-				t_dot right_stack = stack_dot(right);
-				apply_math(&right_stack, fdf->rotation, fdf->offset, fdf->scale);
-				if (current->y == right->y)
-					dda(fdf->img, fdf->display, &current_stack, &right_stack);
-				right = right->next;
-			}
-			if (down)
-			{
-				t_dot down_stack = stack_dot(down);
-				apply_math(&down_stack, fdf->rotation, fdf->offset, fdf->scale);
-				if (current->x == down->x)
-					dda(fdf->img, fdf->display, &current_stack, &down_stack);
-				down = down->next;
-			}
-		}
-		else if (current_stack.x >= 0 && current_stack.x < fdf->display.width &&
-				 current_stack.y >= 0 && current_stack.y < fdf->display.height)
-			mlx_put_pixel(fdf->img, current_stack.x, current_stack.y, (current_stack.color & 0xFFFFFF) << 8 | 0xFF);
+		if (fdf_ptr->lines)
+			mlx_set_window_title(fdf_ptr->mlx, "FDF - Lines");
+		else
+			mlx_set_window_title(fdf_ptr->mlx, "FDF - Points");
+	}
+	else if (keydata.key == MLX_KEY_C)
+		fdf_ptr->true_color = !fdf_ptr->true_color;
+	else
+		return;
+
+	if (fdf_ptr->img)
+	{
+		mlx_delete_image(fdf_ptr->mlx, fdf_ptr->img);
+		fdf_ptr->img = NULL;
 	}
 }
 

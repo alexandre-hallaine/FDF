@@ -3,18 +3,19 @@
 
 #include "types.h"
 
-void error(char *str);
+t_dot stack_dot(t_dot *dot);
+t_dot *find_dot(t_dot *dot, float x, float y);
+
+void dda(mlx_image_t *img, t_display display, t_dot *dot1, t_dot *dot2);
 
 float get_scale(t_dot *map, t_display display);
 t_dot *read_map(char *filename);
 void free_map(t_dot *map);
 
-t_dot stack_dot(t_dot *dot);
-t_dot *find_dot(t_dot *dot, float x, float y);
+void render(t_fdf *fdf);
 
-void apply_math(t_dot *dot, t_dot rotation, t_dot offset, float zoom);
-
-void dda(mlx_image_t *img, t_display display, t_dot *dot1, t_dot *dot2);
-
+void key_hook(mlx_key_data_t keydata, void *fdf);
 void loop(void *fdf);
+
+void error(char *str);
 #endif

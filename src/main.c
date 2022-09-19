@@ -1,28 +1,12 @@
 #include "functions.h"
 
-void key_hook(mlx_key_data_t keydata, void *fdf)
+#include <stdio.h>
+#include <stdlib.h>
+
+void error(char *str)
 {
-	if (keydata.action != MLX_PRESS)
-		return;
-
-	t_fdf *fdf_ptr = (t_fdf *)fdf;
-	if (keydata.key == MLX_KEY_ESCAPE)
-		mlx_close_window(fdf_ptr->mlx);
-	if (keydata.key == MLX_KEY_L)
-	{
-		fdf_ptr->lines = !fdf_ptr->lines;
-
-		if (fdf_ptr->lines)
-			mlx_set_window_title(fdf_ptr->mlx, "FDF - Lines");
-		else
-			mlx_set_window_title(fdf_ptr->mlx, "FDF - Points");
-
-		if (fdf_ptr->img)
-		{
-			mlx_delete_image(fdf_ptr->mlx, fdf_ptr->img);
-			fdf_ptr->img = NULL;
-		}
-	}
+	dprintf(2, "%s\n", str);
+	exit(1);
 }
 
 int main(int argc, char **argv)
@@ -30,12 +14,11 @@ int main(int argc, char **argv)
 	if (argc != 2)
 		error("Usage: ./main <filename>");
 
+	t_dot *map = read_map(argv[1]);
 	t_display display = {
 		.width = 1200,
 		.height = 900,
 	};
-
-	t_dot *map = read_map(argv[1]);
 	t_fdf fdf = {
 		.map = map,
 		.scale = get_scale(map, display),
