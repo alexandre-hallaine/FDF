@@ -11,7 +11,7 @@ void key_hook(mlx_key_data_t keydata, void *fdf)
 
 	if (keydata.key == MLX_KEY_ESCAPE)
 		mlx_close_window(fdf_ptr->mlx);
-	else if (keydata.key == MLX_KEY_L)
+	else if (keydata.key == MLX_KEY_SPACE)
 	{
 		fdf_ptr->lines = !fdf_ptr->lines;
 

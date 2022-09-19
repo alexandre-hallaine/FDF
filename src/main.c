@@ -9,6 +9,13 @@ void error(char *str)
 	exit(1);
 }
 
+void usage(mlx_t *mlx)
+{
+	char *str = "Rotate: WS/AD/QE | Move: Arrows | Zoom: +/- | Switch: Space | Color: C | Reset: R | Exit: Esc";
+	mlx_image_t *img = mlx_put_string(mlx, str, 0, 0);
+	mlx_image_to_window(mlx, img, 0, 0);
+}
+
 int main(int argc, char **argv)
 {
 	if (argc != 2)
@@ -34,9 +41,11 @@ int main(int argc, char **argv)
 		.mlx = mlx_init(display.width, display.height, "FDF - Lines", false),
 	};
 
+	usage(fdf.mlx);
 	mlx_key_hook(fdf.mlx, key_hook, &fdf);
 	mlx_loop_hook(fdf.mlx, loop, &fdf);
 	mlx_loop(fdf.mlx);
+
 	mlx_terminate(fdf.mlx);
 	free_map(map);
 	return 0;

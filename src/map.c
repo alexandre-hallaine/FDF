@@ -53,10 +53,21 @@ float get_scale(t_dot *map, t_display display)
 	float x[2], y[2], z[2];
 	map_delta(map, x, y, z);
 
-	float scale_x = display.width / (x[1] - x[0]);
-	float scale_y = display.height / (y[1] - y[0]);
-	float scale = scale_x < scale_y ? scale_x : scale_y;
-	return scale / 2;
+	t_dot size = {
+		.x = x[1] - x[0] + 1,
+		.y = y[1] - y[0] + 1,
+		.z = z[1] - z[0] + 1,
+	};
+
+	t_dot scale = {
+		.x = display.width / size.x,
+		.y = display.height / size.y,
+		.z = display.height / size.z,
+	};
+
+	float final_scale = scale.x < scale.y ? scale.x : scale.y;
+	final_scale = final_scale < scale.z ? final_scale : scale.z;
+	return final_scale / 2;
 }
 
 void update_data(t_dot *dot, bool is_color, bool is_hexa, bool is_negatif, char c)
