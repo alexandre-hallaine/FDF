@@ -33,6 +33,11 @@ int two_color(int color1, int color2, float percent)
 
 void dda(mlx_image_t *img, t_display display, t_dot *dot1, t_dot *dot2)
 {
+	if ((dot1->x < 0 && dot2->x < 0) || (dot1->x >= display.width && dot2->x >= display.width))
+		return;
+	if ((dot1->y < 0 && dot2->y < 0) || (dot1->y >= display.height && dot2->y >= display.height))
+		return;
+
 	t_dot tmp1 = stack_dot(dot1);
 	t_dot tmp2 = stack_dot(dot2);
 
