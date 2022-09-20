@@ -52,13 +52,13 @@ bool check_key(t_fdf *fdf)
 		fdf->rotation.y -= 0.05;
 
 	if (mlx_is_key_down(fdf->mlx, MLX_KEY_UP))
-		fdf->offset.y -= 10;
-	if (mlx_is_key_down(fdf->mlx, MLX_KEY_DOWN))
 		fdf->offset.y += 10;
+	if (mlx_is_key_down(fdf->mlx, MLX_KEY_DOWN))
+		fdf->offset.y -= 10;
 	if (mlx_is_key_down(fdf->mlx, MLX_KEY_LEFT))
-		fdf->offset.x -= 10;
-	if (mlx_is_key_down(fdf->mlx, MLX_KEY_RIGHT))
 		fdf->offset.x += 10;
+	if (mlx_is_key_down(fdf->mlx, MLX_KEY_RIGHT))
+		fdf->offset.x -= 10;
 
 	if (mlx_is_key_down(fdf->mlx, MLX_KEY_KP_ADD))
 		fdf->scale *= 1.05;
