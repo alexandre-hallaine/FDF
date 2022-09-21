@@ -11,7 +11,7 @@ void error(char *str)
 
 void usage(mlx_t *mlx)
 {
-	char *str = "Rotate: WS/AD/QE | Move: Arrows | Zoom: +/- | Switch: Space | Color: C | Reset: R | Exit: Esc";
+	char *str = "Move: Mouse, Zoom: Scroll, Rotate: Arrows, Mode: Space, Color: C, Reset: R, Quit: Esc";
 	mlx_image_t *img = mlx_put_string(mlx, str, 0, 0);
 	mlx_image_to_window(mlx, img, 0, 0);
 }
@@ -42,6 +42,7 @@ int main(int argc, char **argv)
 	};
 
 	usage(fdf.mlx);
+	mlx_set_cursor(fdf.mlx, mlx_create_std_cursor(MLX_CURSOR_HAND));
 	mlx_key_hook(fdf.mlx, key_hook, &fdf);
 	mlx_scroll_hook(fdf.mlx, scroll_hook, &fdf);
 	mlx_cursor_hook(fdf.mlx, cursor_hook, &fdf);

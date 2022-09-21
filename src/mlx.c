@@ -1,18 +1,22 @@
 #include "functions.h"
 
 #include <stdbool.h>
+#include <stdio.h>
 
 void scroll_hook(double xdelta, double ydelta, void *param)
 {
 	t_fdf *fdf = (t_fdf *)param;
 	float focator = 1 + ydelta / 10;
-	if (fdf->scale * focator >= 1 && fdf->scale * focator <= 1000)
-	{
-		fdf->scale *= focator;
+	if (fdf->scale * focator < 1 || fdf->scale * focator > 1000)
+		return;
 
-		fdf->offset.x = (fdf->offset.x - fdf->display.width / 2) * focator + fdf->display.width / 2;
-		fdf->offset.y = (fdf->offset.y - fdf->display.height / 2) * focator + fdf->display.height / 2;
-	}
+	int mouse_x, mouse_y;
+	mlx_get_mouse_pos(fdf->mlx, &mouse_x, &mouse_y);
+
+	fdf->scale *= focator;
+	fdf->offset.x = (fdf->offset.x - mouse_x) * focator + mouse_x;
+	fdf->offset.y = (fdf->offset.y - mouse_y) * focator + mouse_y;
+
 	(void)xdelta;
 }
 
@@ -63,6 +67,16 @@ void key_hook(mlx_key_data_t keydata, void *param)
 
 void keys(t_fdf *fdf)
 {
+	if (mlx_is_key_down(fdf->mlx, MLX_KEY_R))
+	{
+		fdf->rotation.x = 0;
+		fdf->rotation.y = 0;
+		fdf->rotation.z = 0;
+		fdf->offset.x = fdf->display.width / 2;
+		fdf->offset.y = fdf->display.height / 2;
+		fdf->scale = get_scale(fdf->map, fdf->display);
+	}
+
 	if (mlx_is_key_down(fdf->mlx, MLX_KEY_W))
 		fdf->rotation.x += 0.05;
 	if (mlx_is_key_down(fdf->mlx, MLX_KEY_S))
@@ -75,30 +89,6 @@ void keys(t_fdf *fdf)
 		fdf->rotation.y += 0.05;
 	if (mlx_is_key_down(fdf->mlx, MLX_KEY_E))
 		fdf->rotation.y -= 0.05;
-
-	if (mlx_is_key_down(fdf->mlx, MLX_KEY_UP))
-		fdf->offset.y += 10;
-	if (mlx_is_key_down(fdf->mlx, MLX_KEY_DOWN))
-		fdf->offset.y -= 10;
-	if (mlx_is_key_down(fdf->mlx, MLX_KEY_LEFT))
-		fdf->offset.x += 10;
-	if (mlx_is_key_down(fdf->mlx, MLX_KEY_RIGHT))
-		fdf->offset.x -= 10;
-
-	if (mlx_is_key_down(fdf->mlx, MLX_KEY_KP_ADD))
-		fdf->scale *= 1.05;
-	if (mlx_is_key_down(fdf->mlx, MLX_KEY_KP_SUBTRACT))
-		fdf->scale *= 0.95;
-
-	if (mlx_is_key_down(fdf->mlx, MLX_KEY_R))
-	{
-		fdf->rotation.x = 0;
-		fdf->rotation.y = 0;
-		fdf->rotation.z = 0;
-		fdf->offset.x = fdf->display.width / 2;
-		fdf->offset.y = fdf->display.height / 2;
-		fdf->scale = get_scale(fdf->map, fdf->display);
-	}
 }
 
 void loop(void *fdf)
