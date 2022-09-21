@@ -14,7 +14,9 @@ void free_map(t_dot *map);
 
 void render(t_fdf *fdf);
 
-void key_hook(mlx_key_data_t keydata, void *fdf);
+void scroll_hook(double xdelta, double ydelta, void* param);
+void cursor_hook(double xpos, double ypos, void* param);
+void key_hook(mlx_key_data_t keydata, void* param);
 void loop(void *fdf);
 
 void error(char *str);

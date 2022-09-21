@@ -2,42 +2,67 @@
 
 #include <stdbool.h>
 
-void key_hook(mlx_key_data_t keydata, void *fdf)
+void scroll_hook(double xdelta, double ydelta, void *param)
+{
+	t_fdf *fdf = (t_fdf *)param;
+	float focator = 1 + ydelta / 10;
+	if (fdf->scale * focator >= 1 && fdf->scale * focator <= 1000)
+	{
+		fdf->scale *= focator;
+
+		fdf->offset.x = (fdf->offset.x - fdf->display.width / 2) * focator + fdf->display.width / 2;
+		fdf->offset.y = (fdf->offset.y - fdf->display.height / 2) * focator + fdf->display.height / 2;
+	}
+	(void)xdelta;
+}
+
+void cursor_hook(double xpos, double ypos, void *param)
+{
+	static double last_xpos = 0, last_ypos = 0;
+
+	t_fdf *fdf = (t_fdf *)param;
+	if (mlx_is_mouse_down(fdf->mlx, MLX_MOUSE_BUTTON_LEFT))
+	{
+		fdf->offset.x += xpos - last_xpos;
+		fdf->offset.y += ypos - last_ypos;
+	}
+
+	last_xpos = xpos;
+	last_ypos = ypos;
+}
+
+void key_hook(mlx_key_data_t keydata, void *param)
 {
 	if (keydata.action != MLX_RELEASE)
 		return;
 
-	t_fdf *fdf_ptr = (t_fdf *)fdf;
+	t_fdf *fdf = (t_fdf *)param;
 
 	if (keydata.key == MLX_KEY_ESCAPE)
-		mlx_close_window(fdf_ptr->mlx);
+		mlx_close_window(fdf->mlx);
 	else if (keydata.key == MLX_KEY_SPACE)
 	{
-		fdf_ptr->lines = !fdf_ptr->lines;
+		fdf->lines = !fdf->lines;
 
-		if (fdf_ptr->lines)
-			mlx_set_window_title(fdf_ptr->mlx, "FDF - Lines");
+		if (fdf->lines)
+			mlx_set_window_title(fdf->mlx, "FDF - Lines");
 		else
-			mlx_set_window_title(fdf_ptr->mlx, "FDF - Points");
+			mlx_set_window_title(fdf->mlx, "FDF - Points");
 	}
 	else if (keydata.key == MLX_KEY_C)
-		fdf_ptr->true_color = !fdf_ptr->true_color;
+		fdf->true_color = !fdf->true_color;
 	else
 		return;
 
-	if (fdf_ptr->img)
+	if (fdf->img)
 	{
-		mlx_delete_image(fdf_ptr->mlx, fdf_ptr->img);
-		fdf_ptr->img = NULL;
+		mlx_delete_image(fdf->mlx, fdf->img);
+		fdf->img = NULL;
 	}
 }
 
-bool check_key(t_fdf *fdf)
+void keys(t_fdf *fdf)
 {
-	t_dot old_rotation = fdf->rotation;
-	t_dot old_offset = fdf->offset;
-	float old_scale = fdf->scale;
-
 	if (mlx_is_key_down(fdf->mlx, MLX_KEY_W))
 		fdf->rotation.x += 0.05;
 	if (mlx_is_key_down(fdf->mlx, MLX_KEY_S))
@@ -74,28 +99,17 @@ bool check_key(t_fdf *fdf)
 		fdf->offset.y = fdf->display.height / 2;
 		fdf->scale = get_scale(fdf->map, fdf->display);
 	}
-
-	if (old_rotation.x != fdf->rotation.x ||
-		old_rotation.y != fdf->rotation.y ||
-		old_rotation.z != fdf->rotation.z ||
-		old_offset.x != fdf->offset.x ||
-		old_offset.y != fdf->offset.y ||
-		old_scale != fdf->scale)
-		return (true);
-	return (false);
 }
 
 void loop(void *fdf)
 {
 	t_fdf *fdf_ptr = (t_fdf *)fdf;
 	if (fdf_ptr->img)
-	{
-		if (!check_key(fdf_ptr))
-			return;
 		mlx_delete_image(fdf_ptr->mlx, fdf_ptr->img);
-	}
 
 	fdf_ptr->img = mlx_new_image(fdf_ptr->mlx, fdf_ptr->display.width, fdf_ptr->display.height);
 	mlx_image_to_window(fdf_ptr->mlx, fdf_ptr->img, 0, 0);
+
+	keys(fdf_ptr);
 	render(fdf_ptr);
 }

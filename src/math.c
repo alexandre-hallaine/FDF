@@ -61,15 +61,15 @@ int get_color(float z, float scale)
 	return (r << 16) | (g << 8) | b;
 }
 
-void update_dot(t_dot *dot, t_dot rotation, t_dot offset, float zoom, bool true_color)
+void update_dot(t_dot *dot, t_fdf *fdf)
 {
-	if (true_color)
-		dot->color = get_color(dot->z, zoom);
+	if (fdf->true_color)
+		dot->color = get_color(dot->z, fdf->scale);
 
-	rotate(dot, rotation);
+	rotate(dot, fdf->rotation);
 	isometri(dot);
-	dot->x = dot->x * zoom + offset.x;
-	dot->y = dot->y * zoom + offset.y;
+	dot->x = dot->x * fdf->scale + fdf->offset.x;
+	dot->y = dot->y * fdf->scale + fdf->offset.y;
 }
 
 void render(t_fdf *fdf)
@@ -81,13 +81,13 @@ void render(t_fdf *fdf)
 	for (; current; current = current->next)
 	{
 		t_dot current_stack = stack_dot(current);
-		update_dot(&current_stack, fdf->rotation, fdf->offset, fdf->scale, fdf->true_color);
+		update_dot(&current_stack, fdf);
 		if (fdf->lines)
 		{
 			if (right)
 			{
 				t_dot right_stack = stack_dot(right);
-				update_dot(&right_stack, fdf->rotation, fdf->offset, fdf->scale, fdf->true_color);
+				update_dot(&right_stack, fdf);
 				if (current->y == right->y)
 					dda(fdf->img, fdf->display, &current_stack, &right_stack);
 				right = right->next;
@@ -95,7 +95,7 @@ void render(t_fdf *fdf)
 			if (down)
 			{
 				t_dot down_stack = stack_dot(down);
-				update_dot(&down_stack, fdf->rotation, fdf->offset, fdf->scale, fdf->true_color);
+				update_dot(&down_stack, fdf);
 				if (current->x == down->x)
 					dda(fdf->img, fdf->display, &current_stack, &down_stack);
 				down = down->next;

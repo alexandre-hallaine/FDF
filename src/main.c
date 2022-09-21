@@ -43,6 +43,8 @@ int main(int argc, char **argv)
 
 	usage(fdf.mlx);
 	mlx_key_hook(fdf.mlx, key_hook, &fdf);
+	mlx_scroll_hook(fdf.mlx, scroll_hook, &fdf);
+	mlx_cursor_hook(fdf.mlx, cursor_hook, &fdf);
 	mlx_loop_hook(fdf.mlx, loop, &fdf);
 	mlx_loop(fdf.mlx);
 
