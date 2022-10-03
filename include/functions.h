@@ -3,21 +3,23 @@
 
 #include "types.h"
 
-t_dot stack_dot(t_dot *dot);
-t_dot *find_dot(t_dot *dot, float x, float y);
+void error(char *str);
 
-void dda(mlx_image_t *img, t_display display, t_dot *dot1, t_dot *dot2);
+float scale(t_dot *map, t_size window);
+t_dot *load_map(char *filename);
+void free_map(t_dot *current);
 
-float get_scale(t_dot *map, t_display display);
-t_dot *read_map(char *filename);
-void free_map(t_dot *map);
+char *generate_title(t_option option);
+t_window generate_window(t_option option);
+void start(t_fdf fdf);
+
+void scroll_hook(double xdelta, double ydelta, void *param);
+void cursor_hook(double xpos, double ypos, void *param);
+void key_hook(mlx_key_data_t keydata, void *param);
+void loop_hook(void *param);
 
 void render(t_fdf *fdf);
 
-void scroll_hook(double xdelta, double ydelta, void* param);
-void cursor_hook(double xpos, double ypos, void* param);
-void key_hook(mlx_key_data_t keydata, void* param);
-void loop(void *fdf);
-
-void error(char *str);
+bool is_in_window(t_position position, t_window window);
+void dda(t_window window, t_dot dot[2]);
 #endif

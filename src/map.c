@@ -7,72 +7,74 @@
 #define hexa "0123456789abcdef"
 #define HEXA "0123456789ABCDEF"
 
-void map_delta(t_dot *map, float x[2], float y[2], float z[2])
+void map_delta(t_dot *map, t_position delta[2])
 {
-	x[0] = map->x, x[1] = map->x;
-	y[0] = map->y, y[1] = map->y;
-	z[0] = map->z, z[1] = map->z;
+	delta[0].x = map->position.x, delta[0].y = map->position.y, delta[0].z = map->position.z;
+	delta[1].x = map->position.x, delta[1].y = map->position.y, delta[1].z = map->position.z;
 
 	for (t_dot *dot = map; dot; dot = dot->next)
 	{
-		if (dot->x < x[0])
-			x[0] = dot->x;
-		if (dot->x > x[1])
-			x[1] = dot->x;
-		if (dot->y < y[0])
-			y[0] = dot->y;
-		if (dot->y > y[1])
-			y[1] = dot->y;
-		if (dot->z < z[0])
-			z[0] = dot->z;
-		if (dot->z > z[1])
-			z[1] = dot->z;
+		if (dot->position.x < delta[0].x)
+			delta[0].x = dot->position.x;
+		if (dot->position.y < delta[0].y)
+			delta[0].y = dot->position.y;
+		if (dot->position.z < delta[0].z)
+			delta[0].z = dot->position.z;
+
+		if (dot->position.x > delta[1].x)
+			delta[1].x = dot->position.x;
+		if (dot->position.y > delta[1].y)
+			delta[1].y = dot->position.y;
+		if (dot->position.z > delta[1].z)
+			delta[1].z = dot->position.z;
 	}
+}
+
+float scale(t_dot *map, t_size window)
+{
+	t_position delta[2];
+	map_delta(map, delta);
+
+	t_position size = {
+		.x = delta[1].x - delta[0].x,
+		.y = delta[1].y - delta[0].y,
+		.z = delta[1].z - delta[0].z};
+
+	t_position scale = {
+		.x = window.width / size.x,
+		.y = window.height / size.y,
+		.z = window.height / size.z,
+	};
+
+	float final_scale = scale.x;
+	if (scale.y < final_scale)
+		final_scale = scale.y;
+	if (scale.z < final_scale)
+		final_scale = scale.z;
+	return final_scale / 2;
 }
 
 void center_map(t_dot *map)
 {
-	float x[2], y[2], z[2];
-	map_delta(map, x, y, z);
+	t_position delta[2];
+	map_delta(map, delta);
 
-	float x_center = (x[0] + x[1]) / 2;
-	float y_center = (y[0] + y[1]) / 2;
-	float z_center = (z[0] + z[1]) / 2;
+	t_position center = {
+		.x = (delta[0].x + delta[1].x) / 2,
+		.y = (delta[0].y + delta[1].y) / 2,
+		.z = (delta[0].z + delta[1].z) / 2};
 
-	if (x_center != 0 && y_center != 0 && z_center != 0)
-		for (t_dot *dot = map; dot; dot = dot->next)
-		{
-			dot->x -= x_center;
-			dot->y -= y_center;
-			dot->z -= z_center;
-		}
-}
-
-float get_scale(t_dot *map, t_display display)
-{
-	float x[2], y[2], z[2];
-	map_delta(map, x, y, z);
-
-	t_dot size = {
-		.x = x[1] - x[0] + 1,
-		.y = y[1] - y[0] + 1,
-		.z = z[1] - z[0] + 1,
-	};
-
-	t_dot scale = {
-		.x = display.width / size.x,
-		.y = display.height / size.y,
-		.z = display.height / size.z,
-	};
-
-	float final_scale = scale.x < scale.y ? scale.x : scale.y;
-	final_scale = final_scale < scale.z ? final_scale : scale.z;
-	return final_scale / 2;
+	for (t_dot *dot = map; dot; dot = dot->next)
+	{
+		dot->position.x -= center.x;
+		dot->position.y -= center.y;
+		dot->position.z -= center.z;
+	}
 }
 
 void update_data(t_dot *dot, bool is_color, bool is_hexa, bool is_negatif, char c)
 {
-	ssize_t nbr = is_color ? dot->color : dot->z;
+	ssize_t nbr = is_color ? dot->color : dot->position.z;
 	if (is_hexa)
 	{
 		unsigned char index = 0;
@@ -90,7 +92,7 @@ void update_data(t_dot *dot, bool is_color, bool is_hexa, bool is_negatif, char 
 	if (is_color)
 		dot->color = nbr;
 	else
-		dot->z = nbr;
+		dot->position.z = nbr;
 }
 
 t_dot *get_dot(int fd, char *c)
@@ -106,9 +108,9 @@ t_dot *get_dot(int fd, char *c)
 	}
 
 	t_dot *dot = malloc(sizeof(t_dot));
-	dot->x = x++;
-	dot->y = y;
-	dot->z = *c - '0';
+	dot->position.x = x++;
+	dot->position.y = y;
+	dot->position.z = *c - '0';
 	dot->color = 0;
 
 	bool is_hexa = false, is_color = false, is_negatif = false;
@@ -128,7 +130,7 @@ t_dot *get_dot(int fd, char *c)
 		}
 
 	if (is_color == false)
-		dot->color = 0xffffff;
+		dot->color = 0x00C991FF;
 
 	if (*c == '\n')
 	{
@@ -138,7 +140,7 @@ t_dot *get_dot(int fd, char *c)
 	return dot;
 }
 
-t_dot *read_map(char *filename)
+t_dot *load_map(char *filename)
 {
 	int fd = open(filename, O_RDONLY);
 	if (fd == -1)
@@ -154,19 +156,20 @@ t_dot *read_map(char *filename)
 		while ((current->next = get_dot(fd, c)))
 			current = current->next;
 
-	close(fd);
 	free(c);
+	close(fd);
+
 	center_map(first);
 	return first;
 }
 
-void free_map(t_dot *map)
+void free_map(t_dot *current)
 {
-	t_dot *next;
-	while (map)
+	t_dot *tmp;
+	while (current)
 	{
-		next = map->next;
-		free(map);
-		map = next;
+		tmp = current;
+		current = current->next;
+		free(tmp);
 	}
 }

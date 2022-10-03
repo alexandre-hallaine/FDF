@@ -2,62 +2,53 @@
 
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 
-t_dot stack_dot(t_dot *dot)
+int two_color(int color[2], float percent)
 {
-	if (dot == NULL)
-		return ((t_dot){0, 0, 0, 0, NULL});
-	t_dot new_dot = {
-		.x = dot->x,
-		.y = dot->y,
-		.z = dot->z,
-		.color = dot->color,
-		.next = NULL};
-	return new_dot;
+	int rgb1[3] = {
+		(color[0] >> 16) & 0xFF,
+		(color[0] >> 8) & 0xFF,
+		color[0] & 0xFF};
+	int rgb2[3] = {
+		(color[1] >> 16) & 0xFF,
+		(color[1] >> 8) & 0xFF,
+		color[1] & 0xFF};
+
+	int rgb[3] = {
+		rgb1[0] + (rgb2[0] - rgb1[0]) * percent,
+		rgb1[1] + (rgb2[1] - rgb1[1]) * percent,
+		rgb1[2] + (rgb2[2] - rgb1[2]) * percent};
+	return (rgb[0] << 16) + (rgb[1] << 8) + rgb[2];
 }
 
-t_dot *find_dot(t_dot *dot, float x, float y)
+bool is_in_window(t_position position, t_window window)
 {
-	for (t_dot *tmp = dot; tmp; tmp = tmp->next)
-		if (tmp->x == x && tmp->y == y)
-			return tmp;
-	return NULL;
+	return (position.x >= 0 && position.x < window.size.width &&
+			position.y >= 0 && position.y < window.size.height);
 }
 
-int two_color(int color1, int color2, float percent)
+void dda(t_window window, t_dot dot[2])
 {
-	int r = (color1 >> 16) * (1 - percent) + (color2 >> 16) * percent;
-	int g = ((color1 >> 8) & 0xFF) * (1 - percent) + ((color2 >> 8) & 0xFF) * percent;
-	int b = (color1 & 0xFF) * (1 - percent) + (color2 & 0xFF) * percent;
-	return (r << 16) | (g << 8) | b;
-}
-
-void dda(mlx_image_t *img, t_display display, t_dot *dot1, t_dot *dot2)
-{
-	if ((dot1->x < 0 && dot2->x < 0) || (dot1->x >= display.width && dot2->x >= display.width))
-		return;
-	if ((dot1->y < 0 && dot2->y < 0) || (dot1->y >= display.height && dot2->y >= display.height))
+	if (!is_in_window(dot[0].position, window) &&
+		!is_in_window(dot[1].position, window))
 		return;
 
-	t_dot tmp1 = stack_dot(dot1);
-	t_dot tmp2 = stack_dot(dot2);
-
-	t_dot delta = {
-		.x = tmp2.x - tmp1.x,
-		.y = tmp2.y - tmp1.y};
-
+	t_position delta = {
+		.x = ABS(dot[1].position.x - dot[0].position.x),
+		.y = ABS(dot[1].position.y - dot[0].position.y)};
 	float step = ABS(delta.x) > ABS(delta.y) ? ABS(delta.x) : ABS(delta.y);
-
 	delta.x /= step;
 	delta.y /= step;
 
-	for (size_t i = 0; i <= step; i++)
+	t_position tmp = dot[0].position;
+	for (float current = 0; current <= step; current++)
 	{
-		int color = two_color(tmp1.color, tmp2.color, (float)i / step);
-		if (tmp1.x >= 0 && tmp1.x < display.width &&
-			tmp1.y >= 0 && tmp1.y < display.height)
-			mlx_put_pixel(img, tmp1.x, tmp1.y, color << 8 | 0xFF);
+		if (is_in_window(tmp, window))
+		{
+			int color = two_color((int[2]){dot[0].color, dot[1].color}, current / step);
+			mlx_put_pixel(window.image, tmp.x, tmp.y, color << 8 | 0xFF);
+		}
 
-		tmp1.x += delta.x;
-		tmp1.y += delta.y;
+		tmp.x += delta.x;
+		tmp.y += delta.y;
 	}
 }

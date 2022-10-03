@@ -9,47 +9,21 @@ void error(char *str)
 	exit(1);
 }
 
-void usage(mlx_t *mlx)
-{
-	char *str = "Move: Mouse, Zoom: Scroll, Rotate: Arrows, Mode: Space, Color: C, Reset: R, Quit: Esc";
-	mlx_image_t *img = mlx_put_string(mlx, str, 0, 0);
-	mlx_image_to_window(mlx, img, 0, 0);
-}
-
 int main(int argc, char **argv)
 {
 	if (argc != 2)
 		error("Usage: ./main <filename>");
 
-	t_dot *map = read_map(argv[1]);
-	t_display display = {
-		.width = 1200,
-		.height = 900,
-	};
-	t_fdf fdf = {
-		.map = map,
-		.scale = get_scale(map, display),
+	t_dot *map = load_map(argv[1]);
+	t_option option = {0};
+	t_window window = generate_window(option);
 
-		.display = display,
-		.offset = {.x = display.width / 2,
-				   .y = display.height / 2},
-		.rotation = {.x = 0,
-					 .y = 0,
-					 .z = 0},
-		.lines = true,
+	option.scale = scale(map, window.size);
+	option.offset = (t_position){window.size.width / 2, window.size.height / 2, 0};
 
-		.mlx = mlx_init(display.width, display.height, "FDF - Lines", false),
-	};
+	start((t_fdf){map, window, option});
 
-	usage(fdf.mlx);
-	mlx_set_cursor(fdf.mlx, mlx_create_std_cursor(MLX_CURSOR_HAND));
-	mlx_key_hook(fdf.mlx, key_hook, &fdf);
-	mlx_scroll_hook(fdf.mlx, scroll_hook, &fdf);
-	mlx_cursor_hook(fdf.mlx, cursor_hook, &fdf);
-	mlx_loop_hook(fdf.mlx, loop, &fdf);
-	mlx_loop(fdf.mlx);
-
-	mlx_terminate(fdf.mlx);
+	mlx_terminate(window.pointer);
 	free_map(map);
 	return 0;
 }

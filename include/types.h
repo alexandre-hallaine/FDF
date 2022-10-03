@@ -5,35 +5,53 @@
 
 #include <stddef.h>
 
-typedef struct s_dot t_dot;
-
-struct s_dot
+typedef struct
 {
 	float x;
 	float y;
 	float z;
+} t_position;
+
+typedef struct
+{
+	size_t width;
+	size_t height;
+} t_size;
+
+typedef struct s_dot t_dot;
+
+struct s_dot
+{
+	t_position position;
+	t_position pixel;
+
 	int color;
 	t_dot *next;
 };
 
 typedef struct
 {
-	size_t width;
-	size_t height;
-} t_display;
+	t_position offset;
+	t_position rotation;
+	float scale;
+
+	bool isLine;
+	bool isColor;
+} t_option;
+
+typedef struct
+{
+	t_size size;
+
+	mlx_t *pointer;
+	mlx_image_t *image;
+} t_window;
 
 typedef struct
 {
 	t_dot *map;
-	float scale;
+	t_window window;
 
-	t_display display;
-	t_dot offset;
-	t_dot rotation;
-	bool lines;
-	bool true_color;
-
-	mlx_t *mlx;
-	mlx_image_t *img;
+	t_option option;
 } t_fdf;
 #endif
