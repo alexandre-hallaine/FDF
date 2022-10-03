@@ -7,8 +7,8 @@ char *generate_title(t_option option)
 {
 	char title[1 << 8] = {0};
 	strcat(title, "FDF");
-	if (option.isLine)
-		strcat(title, " (Lines)");
+	if (!option.isLine)
+		strcat(title, " (Dot)");
 	if (option.isColor)
 		strcat(title, " (Color)");
 	return strdup(title);

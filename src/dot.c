@@ -28,18 +28,18 @@ bool is_in_window(t_position position, t_window window)
 
 void dda(t_window window, t_dot dot[2])
 {
-	if (!is_in_window(dot[0].position, window) &&
-		!is_in_window(dot[1].position, window))
+	if (!is_in_window(dot[0].pixel, window) &&
+		!is_in_window(dot[1].pixel, window))
 		return;
 
 	t_position delta = {
-		.x = ABS(dot[1].position.x - dot[0].position.x),
-		.y = ABS(dot[1].position.y - dot[0].position.y)};
+		.x = dot[1].pixel.x - dot[0].pixel.x,
+		.y = dot[1].pixel.y - dot[0].pixel.y};
 	float step = ABS(delta.x) > ABS(delta.y) ? ABS(delta.x) : ABS(delta.y);
 	delta.x /= step;
 	delta.y /= step;
 
-	t_position tmp = dot[0].position;
+	t_position tmp = dot[0].pixel;
 	for (float current = 0; current <= step; current++)
 	{
 		if (is_in_window(tmp, window))

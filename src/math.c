@@ -58,39 +58,25 @@ void render(t_fdf *fdf)
 	for (t_dot *dot = fdf->map; dot; dot = dot->next)
 		dot->pixel = to_pixel(dot->position, fdf->option);
 
-	for (t_dot *dot = fdf->map; dot; dot = dot->next)
-		if (is_in_window(dot->pixel, fdf->window))
+	t_dot *dot = fdf->map;
+	t_dot *next_y = dot;
+
+	for (; dot; dot = dot->next)
+		if (fdf->option.isLine)
+		{
+			if (dot->next && dot->next->position.y == dot->position.y)
+				dda(fdf->window, (t_dot[2]){*dot, *dot->next});
+
+			while (next_y && next_y->position.y <= dot->position.y)
+				next_y = next_y->next;
+
+			while (next_y && next_y->position.x < dot->position.x &&
+				   (next_y->next && next_y->next->position.y == next_y->position.y))
+				next_y = next_y->next;
+
+			if (next_y && next_y->position.x == dot->position.x)
+				dda(fdf->window, (t_dot[2]){*dot, *next_y});
+		}
+		else if (is_in_window(dot->pixel, fdf->window))
 			mlx_put_pixel(fdf->window.image, dot->pixel.x, dot->pixel.y, dot->color << 8 | 0xFF);
-
-	// t_dot *current = fdf->map;
-	// t_dot *right = find_dot(fdf->map, current->x + 1, current->y);
-	// t_dot *down = find_dot(fdf->map, current->x, current->y + 1);
-
-	// for (; current; current = current->next)
-	// {
-	// 	t_dot current_stack = stack_dot(current);
-	// 	update_dot(&current_stack, fdf);
-	// 	if (fdf->lines)
-	// 	{
-	// 		if (right)
-	// 		{
-	// 			t_dot right_stack = stack_dot(right);
-	// 			update_dot(&right_stack, fdf);
-	// 			if (current->y == right->y)
-	// 				dda(fdf->img, fdf->display, &current_stack, &right_stack);
-	// 			right = right->next;
-	// 		}
-	// 		if (down)
-	// 		{
-	// 			t_dot down_stack = stack_dot(down);
-	// 			update_dot(&down_stack, fdf);
-	// 			if (current->x == down->x)
-	// 				dda(fdf->img, fdf->display, &current_stack, &down_stack);
-	// 			down = down->next;
-	// 		}
-	// 	}
-	// 	else if (current_stack.x >= 0 && current_stack.x < fdf->display.width &&
-	// 			 current_stack.y >= 0 && current_stack.y < fdf->display.height)
-	// 		mlx_put_pixel(fdf->img, current_stack.x, current_stack.y, current_stack.color << 8 | 0xFF);
-	// }
 }

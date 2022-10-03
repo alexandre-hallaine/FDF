@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 		error("Usage: ./main <filename>");
 
 	t_dot *map = load_map(argv[1]);
-	t_option option = {0};
+	t_option option = {.isLine = true, .isColor = false};
 	t_window window = generate_window(option);
 
 	option.scale = scale(map, window.size);

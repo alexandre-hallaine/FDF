@@ -47,11 +47,11 @@ float scale(t_dot *map, t_size window)
 	};
 
 	float final_scale = scale.x;
-	if (scale.y < final_scale)
+	if (scale.y > final_scale)
 		final_scale = scale.y;
-	if (scale.z < final_scale)
+	if (scale.z > final_scale)
 		final_scale = scale.z;
-	return final_scale / 2;
+	return final_scale / 3;
 }
 
 void center_map(t_dot *map)
@@ -99,13 +99,18 @@ t_dot *get_dot(int fd, char *c)
 {
 	static size_t x = 0, y = 0;
 
-	while (true)
+	do
 	{
+		if (*c == '\n')
+		{
+			x = 0;
+			y++;
+		}
+		else if (*c != ' ' && *c != '\t' && *c != '\0')
+			break;
 		if (read(fd, c, 1) <= 0)
 			return NULL;
-		if (*c != ' ' && *c != '\n')
-			break;
-	}
+	} while (true);
 
 	t_dot *dot = malloc(sizeof(t_dot));
 	dot->position.x = x++;
@@ -131,12 +136,6 @@ t_dot *get_dot(int fd, char *c)
 
 	if (is_color == false)
 		dot->color = 0x00C991FF;
-
-	if (*c == '\n')
-	{
-		x = 0;
-		y++;
-	}
 	return dot;
 }
 
@@ -149,6 +148,7 @@ t_dot *load_map(char *filename)
 	char *c = malloc(sizeof(char));
 	if (c == NULL)
 		return NULL;
+	*c = 0;
 
 	t_dot *first = get_dot(fd, c);
 	t_dot *current = first;
