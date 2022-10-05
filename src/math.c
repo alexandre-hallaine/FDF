@@ -55,17 +55,27 @@ t_position to_pixel(t_position position, t_option option)
 
 void render(t_fdf *fdf)
 {
-	for (t_dot *dot = fdf->map; dot; dot = dot->next)
-		dot->pixel = to_pixel(dot->position, fdf->option);
+	size_t size_z = fdf->map.max.z - fdf->map.min.z;
+	for (t_dot *dot = fdf->map.first; dot; dot = dot->next)
+	{
+		dot->pixel->position = to_pixel(dot->position, fdf->option);
+		if (fdf->option.isColor)
+		{
+			unsigned char color = (dot->position.z - fdf->map.min.z) * 255 / size_z;
+			dot->pixel->color = color << 16 | color << 8 | color;
+		}
+		else
+			dot->pixel->color = dot->color;
+	}
 
-	t_dot *dot = fdf->map;
+	t_dot *dot = fdf->map.first;
 	t_dot *next_y = dot;
 
 	for (; dot; dot = dot->next)
 		if (fdf->option.isLine)
 		{
 			if (dot->next && dot->next->position.y == dot->position.y)
-				dda(fdf->window, (t_dot[2]){*dot, *dot->next});
+				dda((t_dot[2]){*dot, *dot->next}, fdf->window);
 
 			while (next_y && next_y->position.y <= dot->position.y)
 				next_y = next_y->next;
@@ -75,8 +85,8 @@ void render(t_fdf *fdf)
 				next_y = next_y->next;
 
 			if (next_y && next_y->position.x == dot->position.x)
-				dda(fdf->window, (t_dot[2]){*dot, *next_y});
+				dda((t_dot[2]){*dot, *next_y}, fdf->window);
 		}
-		else if (is_in_window(dot->pixel, fdf->window))
-			mlx_put_pixel(fdf->window.image, dot->pixel.x, dot->pixel.y, dot->color << 8 | 0xFF);
+		else if (is_in_window(dot->pixel->position, fdf->window))
+			mlx_put_pixel(fdf->window.image, dot->pixel->position.x, dot->pixel->position.y, dot->pixel->color << 8 | 0xFF);
 }

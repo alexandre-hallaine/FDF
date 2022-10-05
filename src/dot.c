@@ -26,25 +26,21 @@ bool is_in_window(t_position position, t_window window)
 			position.y >= 0 && position.y < window.size.height);
 }
 
-void dda(t_window window, t_dot dot[2])
+void dda(t_dot dot[2], t_window window)
 {
-	if (!is_in_window(dot[0].pixel, window) &&
-		!is_in_window(dot[1].pixel, window))
-		return;
-
 	t_position delta = {
-		.x = dot[1].pixel.x - dot[0].pixel.x,
-		.y = dot[1].pixel.y - dot[0].pixel.y};
+		.x = dot[1].pixel->position.x - dot[0].pixel->position.x,
+		.y = dot[1].pixel->position.y - dot[0].pixel->position.y};
 	float step = ABS(delta.x) > ABS(delta.y) ? ABS(delta.x) : ABS(delta.y);
 	delta.x /= step;
 	delta.y /= step;
 
-	t_position tmp = dot[0].pixel;
+	t_position tmp = dot[0].pixel->position;
 	for (float current = 0; current <= step; current++)
 	{
 		if (is_in_window(tmp, window))
 		{
-			int color = two_color((int[2]){dot[0].color, dot[1].color}, current / step);
+			int color = two_color((int[2]){dot[0].pixel->color, dot[1].pixel->color}, current / step);
 			mlx_put_pixel(window.image, tmp.x, tmp.y, color << 8 | 0xFF);
 		}
 

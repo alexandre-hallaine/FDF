@@ -23,11 +23,27 @@ typedef struct s_dot t_dot;
 struct s_dot
 {
 	t_position position;
-	t_position pixel;
-
 	int color;
+
 	t_dot *next;
+	t_dot *pixel;
 };
+
+typedef struct
+{
+	t_dot *first;
+
+	t_position min;
+	t_position max;
+} t_map;
+
+typedef struct
+{
+	t_size size;
+
+	mlx_t *pointer;
+	mlx_image_t *image;
+} t_window;
 
 typedef struct
 {
@@ -41,15 +57,7 @@ typedef struct
 
 typedef struct
 {
-	t_size size;
-
-	mlx_t *pointer;
-	mlx_image_t *image;
-} t_window;
-
-typedef struct
-{
-	t_dot *map;
+	t_map map;
 	t_window window;
 
 	t_option option;
