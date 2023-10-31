@@ -3,31 +3,29 @@ CFLAGS	:= -Wall -Wextra -Werror -Wunreachable-code -Ofast
 LIBMLX	:= ./lib/MLX42
 
 HEADERS	:= -I ./include -I $(LIBMLX)/include
-LIBS	:= $(LIBMLX)/libmlx42.a -ldl -lglfw -pthread -lm
-SRCDIR	:= ./src
-OBJDIR	:= ./obj
-SRCS	:= $(shell cd $(SRCDIR) && find . -name "*.c")
-OBJS	:= $(SRCS:%.c=$(OBJDIR)/%.o)
+LIBS	:= $(LIBMLX)/build/libmlx42.a -ldl -lglfw -pthread -lm
+SRCS	:= $(shell find src -type f -name "*.c")
+OBJS	:= $(SRCS:src/%.c=obj/%.o)
 
 all: libmlx $(NAME)
 
 libmlx:
-	$(MAKE) -C $(LIBMLX)
+	cmake $(LIBMLX) -B $(LIBMLX)/build
+	make -C $(LIBMLX)/build -j4
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
+obj/%.o: src/%.c
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS) && echo "Compiling: $(notdir $<)"
 
 $(NAME): $(OBJS)
-	$(CC) $(OBJS) $(LIBS) $(HEADERS) -o $(NAME)
+	$(CC) $(OBJS) $(LIBS) $(HEADERS) -o $(NAME) && echo "Linked: $(NAME)"
 
 clean:
-	rm -rf $(OBJDIR)
-	$(MAKE) -C $(LIBMLX) clean
+	rm -rf $(OBJS) && echo "Removed: $(OBJS)"
+	rm -rf $(LIBMLX)/build && echo "Removed: $(LIBMLX)/build"
 
 fclean: clean
-	rm -f $(NAME)
-	$(MAKE) -C $(LIBMLX) fclean
+	rm -rf $(NAME) && echo "Removed: $(NAME)"
 
 re: clean all
 
