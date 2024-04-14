@@ -148,12 +148,12 @@ t_map load_map(char *filename)
 {
 	int fd = open(filename, O_RDONLY);
 	if (fd == -1)
-		error("Error: open() failed");
+		error(2, "Error: open() failed\n");
 
 	char c = 0;
 	t_dot *first = get_dot(fd, &c);
 	if (first == NULL)
-		error("Error: get_dot() failed");
+		error(3, "Error: get_dot() failed\n");
 	for (t_dot *dot = first; dot; dot = dot->next)
 		dot->next = get_dot(fd, &c);
 	close(fd);

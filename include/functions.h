@@ -3,7 +3,8 @@
 
 #include "types.h"
 
-void error(char *str);
+// main.c
+void error(int code, char *str, ...);
 
 float scale(t_position delta[2], t_size window);
 t_map load_map(char *filename);
