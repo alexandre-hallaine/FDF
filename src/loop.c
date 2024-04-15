@@ -42,10 +42,12 @@ void loop(mlx_t *mlx) {
 		for (size_t x = 0; g_data.dots[y][x].color; x++) {
 			t_dot *dot = &g_data.dots[y][x];
 			isometri(dot, x, y, dot->height);
-			dot->position[0] *= 15;
-			dot->position[1] *= 15;
-			dot->position[0] += WIDTH / 2;
-			dot->position[1] += HEIGHT / 2;
+
+			dot->position[0] *= g_data.options.scale;
+			dot->position[1] *= g_data.options.scale;
+
+			dot->position[0] += g_data.options.offset[0];
+			dot->position[1] += g_data.options.offset[1];
 		}
 
 	for (size_t y = 0; g_data.dots[y]; y++)

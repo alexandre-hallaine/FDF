@@ -21,9 +21,18 @@ int main(int argc, char **argv)
 		error(1, "Usage: %s <filename>\n", argv[0]);
 
 	load_map(argv[1]);
+
+	g_data.options = (t_options){
+		.offset = {WIDTH / 2, HEIGHT / 2},
+		.scale = 1
+	};
 	
 	mlx_t *mlx = mlx_init(WIDTH, HEIGHT, argv[0], false);
+
+	mlx_scroll_hook(mlx, scroll, mlx);
+	mlx_cursor_hook(mlx, cursor, mlx);
 	mlx_loop_hook(mlx, loop, mlx);
+	
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
 	return 0;

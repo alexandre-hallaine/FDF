@@ -15,9 +15,16 @@ typedef struct s_dot
 	double position[2];
 }  t_dot;
 
+typedef struct s_options
+{
+	int offset[2];
+	float scale;
+} t_options;
+
 typedef struct s_data
 {
 	t_dot **dots;
+	t_options options;
 } t_data;
 
 extern t_data g_data;
