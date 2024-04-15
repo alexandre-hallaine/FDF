@@ -16,8 +16,9 @@ t_map load_map(char *filename) {
 
     while(height < USHRT_MAX) {
         char *line = get_next_line(fd);
-        if (line && *line) lines[height++] = line;
-        else break;
+        if (line == NULL) break;
+        if (*line) lines[height++] = line;
+        else free(line);
     }
 
     if (height == 0) error(2, "Empty file %s\n", filename);

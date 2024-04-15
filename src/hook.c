@@ -2,6 +2,7 @@
 
 void scroll(double xdelta, double ydelta, void *param) {
 	(void)xdelta;
+
 	float focator = 1 + ydelta / 10;
 	g_data.options.scale *= focator;
 
