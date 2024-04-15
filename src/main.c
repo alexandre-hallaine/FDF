@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 		.scale = 1
 	};
 	
-	mlx_t *mlx = mlx_init(WIDTH, HEIGHT, argv[0], false);
+	mlx_t *mlx = mlx_init(WIDTH, HEIGHT, argv[0], true);
 
 	mlx_scroll_hook(mlx, scroll, mlx);
 	mlx_cursor_hook(mlx, cursor, mlx);

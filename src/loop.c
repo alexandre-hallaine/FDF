@@ -24,7 +24,7 @@ void dda(mlx_image_t *image, t_dot dot[2])
 	double tmp[2] = { dot[1].position[0], dot[1].position[1] };
 	for (float current = 0; current <= step; current++)
 	{
-		if (tmp[0] >= 0 && tmp[0] < WIDTH && tmp[1] >= 0 && tmp[1] < HEIGHT)
+		if (tmp[0] >= 0 && tmp[0] < image->width && tmp[1] >= 0 && tmp[1] < image->height)
 			mlx_put_pixel(image, tmp[0], tmp[1], dot[0].color << 8 | 0xFF);
 
 		tmp[0] += delta[0];
@@ -35,7 +35,7 @@ void dda(mlx_image_t *image, t_dot dot[2])
 void loop(mlx_t *mlx) {
 	static mlx_image_t *image = NULL;
 	if (image) mlx_delete_image(mlx, image);
-	image = mlx_new_image(mlx, WIDTH, HEIGHT);
+	image = mlx_new_image(mlx, mlx->width, mlx->height);
 	mlx_image_to_window(mlx, image, 0, 0);
 
 	for (size_t y = 0; g_data.dots[y]; y++)
