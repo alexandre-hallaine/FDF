@@ -14,3 +14,4 @@ void loop(void *param);
 // hook.c
 void scroll(double xdelta, double ydelta, mlx_t *mlx);
 void cursor(double xpos, double ypos, mlx_t* mlx);
+void key(mlx_key_data_t keydata, mlx_t* mlx);

@@ -31,6 +31,7 @@ int main(int argc, char **argv)
 
 	mlx_scroll_hook(mlx, scroll, mlx);
 	mlx_cursor_hook(mlx, cursor, mlx);
+	mlx_key_hook(mlx, key, mlx);
 	mlx_loop_hook(mlx, loop, mlx);
 	
 	mlx_loop(mlx);
