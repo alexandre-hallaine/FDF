@@ -20,8 +20,7 @@ int main(int argc, char **argv)
 	if (argc != 2)
 		error(1, "Usage: %s <filename>\n", argv[0]);
 
-	load_map(argv[1]);
-
+	g_data.map = load_map(argv[1]);
 	g_data.options = (t_options){
 		.offset = {WIDTH / 2, HEIGHT / 2},
 		.scale = 1
@@ -36,5 +35,6 @@ int main(int argc, char **argv)
 	
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
+	free(g_data.map.dots);
 	return 0;
 }

@@ -15,15 +15,22 @@ typedef struct s_dot
 	double position[2];
 }  t_dot;
 
+typedef struct s_map
+{
+	unsigned short width;
+	unsigned short height;
+	t_dot *dots;
+} t_map;
+
 typedef struct s_options
 {
-	int offset[2];
+	short offset[2];
 	float scale;
 } t_options;
 
 typedef struct s_data
 {
-	t_dot **dots;
+	t_map map;
 	t_options options;
 } t_data;
 

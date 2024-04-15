@@ -38,9 +38,9 @@ void loop(mlx_t *mlx) {
 	image = mlx_new_image(mlx, mlx->width, mlx->height);
 	mlx_image_to_window(mlx, image, 0, 0);
 
-	for (size_t y = 0; g_data.dots[y]; y++)
-		for (size_t x = 0; g_data.dots[y][x].color; x++) {
-			t_dot *dot = &g_data.dots[y][x];
+	for (unsigned short y = 0; y < g_data.map.height; y++)
+		for (unsigned short x = 0; x < g_data.map.width; x++) {
+			t_dot *dot = &g_data.map.dots[y * g_data.map.width + x];
 			isometri(dot, x, y, dot->height);
 
 			dot->position[0] *= g_data.options.scale;
@@ -50,18 +50,18 @@ void loop(mlx_t *mlx) {
 			dot->position[1] += g_data.options.offset[1];
 		}
 
-	for (size_t y = 0; g_data.dots[y]; y++)
-		for (size_t x = 0; g_data.dots[y][x].color; x++) {
-		 	if (g_data.dots[y][x + 1].color)
-		 		dda(image, (t_dot[2]){
-		 			g_data.dots[y][x],
-		 			g_data.dots[y][x + 1]
-		 		});
+	for (unsigned short y = 0; y < g_data.map.height; y++)
+		for (unsigned short x = 0; x < g_data.map.width; x++) {
+			if (x < g_data.map.width - 1)
+				dda(image, (t_dot[2]){
+					g_data.map.dots[y * g_data.map.width + x],
+					g_data.map.dots[y * g_data.map.width + x + 1]
+				});
 
-		 	if (g_data.dots[y + 1] && g_data.dots[y + 1][x].color)
+		 	if (y < g_data.map.height - 1)
 		 		dda(image, (t_dot[2]){
-		 			g_data.dots[y][x],
-		 			g_data.dots[y + 1][x]
+		 			g_data.map.dots[y * g_data.map.width + x],
+		 			g_data.map.dots[(y + 1) * g_data.map.width + x]
 		 		});
 		}
 }

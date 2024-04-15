@@ -2,72 +2,44 @@
 
 #include "get_next_line.h"
 
-#include <fcntl.h>
 #include <stdlib.h>
+#include <limits.h>
+#include <fcntl.h>
 
-typedef struct s_map_line
-{
-	t_dot *line;
-	struct s_map_line *next;
-} t_map_line;
+t_map load_map(char *filename) {
+    int fd = open(filename, O_RDONLY);
+    if (fd == -1) error(2, "Failed to open file %s\n", filename);
 
-t_map_line *line_next(int fd) {
-    char *line = get_next_line(fd);
-    t_map_line *new = malloc(sizeof(t_map_line));
+    char *lines[USHRT_MAX];
+    unsigned short height = 0;
+    unsigned short width = 0;
 
-    size_t width = 0;
-    if (line && *line)
-        for (char *tmp = line; tmp; tmp = ft_strchr(tmp, ' '), width++)
-            for (; *tmp == ' '; tmp++);
-
-    if (new) {
-        new->line = NULL;
-        new->next = NULL;
-        
-        if (width)
-            new->line = malloc(sizeof(t_dot) * (width + 1));
-        if (new->line)
-            new->line[width].color = 0;
-        else {
-            free(new);
-            new = NULL;
-        }
+    while(height < USHRT_MAX) {
+        char *line = get_next_line(fd);
+        if (line && *line) lines[height++] = line;
+        else break;
     }
 
-    if (new) {
-        char *data = line;
-        for (size_t i = 0; i < width; i++) {
+    if (height == 0) error(2, "Empty file %s\n", filename);
+    for (char *data = *lines; width < USHRT_MAX && data; width++, data = ft_strchr(data, ' '))
+        for (; *data == ' '; data++);
+
+    t_dot *dots = malloc(sizeof(t_dot) * (width * height));
+    if (!dots) error(2, "Failed to allocate memory\n");
+
+    for (size_t i = 0; i < height; i++) {
+        char *data = lines[i];
+        for (size_t j = 0; j < width; j++) {
+            if (!data) error(2, "Invalid map: not enough data\n");
+            
             int height = atoi(data);
-            new->line[i] = (t_dot) {height, 0xFFFFFF, {0, 0}};
+            dots[i * width + j] = (t_dot) {height, 0xFFFFFF, {0, 0}};
 
             data = ft_strchr(data, ' ');
             for (; data && *data == ' '; data++);
         }
+        free(lines[i]);
     }
-    
-    if (line) free(line);
-    return new;
-}
 
-void load_map(char *filename) {
-    int fd = open(filename, O_RDONLY);
-    if (fd == -1)
-        error(1, "Failed to open file %s\n", filename);
-
-    size_t width = 0;
-    t_map_line *line_first = line_next(fd);
-    for (t_map_line *tmp = line_first; tmp; tmp = tmp->next, width++)
-        tmp->next = line_next(fd);
-
-    g_data.dots = malloc(sizeof(t_dot *) * (width + 1));
-    if (g_data.dots) {
-        g_data.dots[width] = NULL;
-        for (size_t i = 0; i < width; i++) {
-            g_data.dots[i] = line_first->line;
-
-            t_map_line *tmp = line_first;
-            line_first = line_first->next;
-            free(tmp);
-        }
-    }
+    return (t_map) {width, height, dots};
 }
