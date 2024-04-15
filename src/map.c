@@ -3,9 +3,7 @@
 #include "get_next_line.h"
 
 #include <fcntl.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 typedef struct s_map_line
 {
@@ -29,7 +27,7 @@ t_map_line *line_next(int fd) {
         if (width)
             new->line = malloc(sizeof(t_dot) * (width + 1));
         if (new->line)
-            new->line[width].color = -1;
+            new->line[width].color = 0;
         else {
             free(new);
             new = NULL;
@@ -39,8 +37,8 @@ t_map_line *line_next(int fd) {
     if (new) {
         char *data = line;
         for (size_t i = 0; i < width; i++) {
-            size_t height = atoi(data);
-            new->line[i] = (t_dot) {height, 0xFF};
+            int height = atoi(data);
+            new->line[i] = (t_dot) {height, 0xFFFFFF, {0, 0}};
 
             data = ft_strchr(data, ' ');
             for (; data && *data == ' '; data++);

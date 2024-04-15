@@ -1,5 +1,5 @@
 NAME	:= fdf
-CFLAGS	:= -Wall -Wextra -Werror -Wunreachable-code -Ofast
+CFLAGS	:= -Wall -Wextra -Wunreachable-code -Ofast
 LIBMLX	:= ./lib/MLX42
 LIBGNL	:= ./lib/get_next_line
 
@@ -12,7 +12,7 @@ all: libmlx libgnl $(NAME)
 
 libmlx:
 	cmake $(LIBMLX) -B $(LIBMLX)/build
-	make -C $(LIBMLX)/build -j4
+	cmake --build $(LIBMLX)/build -j4
 
 libgnl:
 	make -C $(LIBGNL)

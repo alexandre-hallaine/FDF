@@ -21,5 +21,10 @@ int main(int argc, char **argv)
 		error(1, "Usage: %s <filename>\n", argv[0]);
 
 	load_map(argv[1]);
+	
+	mlx_t *mlx = mlx_init(WIDTH, HEIGHT, argv[0], false);
+	mlx_loop_hook(mlx, loop, mlx);
+	mlx_loop(mlx);
+	mlx_terminate(mlx);
 	return 0;
 }

@@ -4,10 +4,15 @@
 
 #include <stddef.h>
 
+#define WIDTH 640
+#define HEIGHT 480
+
 typedef struct s_dot
 {
-	size_t height;
+	int height;
 	int color;
+
+	double position[2];
 }  t_dot;
 
 typedef struct s_data
