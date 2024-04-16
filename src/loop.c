@@ -12,34 +12,31 @@ void isometri(t_dot *dot, float x, float y, float z) {
 
 void dda(mlx_image_t *image, t_dot dot[2])
 {
-	float delta[2] = {
-		dot[0].position[0] - dot[1].position[0],
-		dot[0].position[1] - dot[1].position[1]
+	double position[2] = { dot[0].position[0], dot[0].position[1] };
+	double position_delta[2] = {
+		dot[1].position[0] - position[0],
+		dot[1].position[1] - position[1]
 	};
 
-	float step = ABS(delta[0]) > ABS(delta[1]) ? ABS(delta[0]) : ABS(delta[1]);
-	delta[0] /= step;
-	delta[1] /= step;
-
-	short dot_rgb[2][3] = {
-		{ dot[0].color >> 16 & 0xFF, dot[0].color >> 8 & 0xFF, dot[0].color & 0xFF },
-		{ dot[1].color >> 16 & 0xFF, dot[1].color >> 8 & 0xFF, dot[1].color & 0xFF }
+	float rgb[3] = { dot[0].color >> 16 & 0xFF, dot[0].color >> 8 & 0xFF, dot[0].color & 0xFF };
+	float rgb_delta[3] = {
+		(dot[1].color >> 16 & 0xFF) - rgb[0],
+		(dot[1].color >> 8 & 0xFF) - rgb[1],
+		(dot[1].color & 0xFF) - rgb[2]
 	};
 
-	double tmp[2] = { dot[1].position[0], dot[1].position[1] };
-	for (float current = 0; current <= step; current++)
+	double step_amount = ABS(position_delta[0]) > ABS(position_delta[1]) ? ABS(position_delta[0]) : ABS(position_delta[1]);
+	for (double step = 0; step <= step_amount; step++)
 	{
-		short rgb[3] = {
-			dot_rgb[1][0] + (dot_rgb[0][0] - dot_rgb[1][0]) * current / step,
-			dot_rgb[1][1] + (dot_rgb[0][1] - dot_rgb[1][1]) * current / step,
-			dot_rgb[1][2] + (dot_rgb[0][2] - dot_rgb[1][2]) * current / step
-		};
+		if (position[0] >= 0 && position[0] < image->width && position[1] >= 0 && position[1] < image->height)
+			mlx_put_pixel(image, position[0], position[1], (short)rgb[0] << 24 | (short)rgb[1] << 16 | (short)rgb[2] << 8 | 0xFF);
 
-		if (tmp[0] >= 0 && tmp[0] < image->width && tmp[1] >= 0 && tmp[1] < image->height)
-			mlx_put_pixel(image, tmp[0], tmp[1], rgb[0] << 24 | rgb[1] << 16 | rgb[2] << 8 | 0xFF);
+		position[0] += position_delta[0] / step_amount;
+		position[1] += position_delta[1] / step_amount;
 
-		tmp[0] += delta[0];
-		tmp[1] += delta[1];
+		rgb[0] += rgb_delta[0] / step_amount;
+		rgb[1] += rgb_delta[1] / step_amount;
+		rgb[2] += rgb_delta[2] / step_amount;
 	}
 }
 
