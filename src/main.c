@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 	g_data.map = load_map(argv[1]);
 	g_data.options = (t_options){
 		.offset = {WIDTH / 2, HEIGHT / 2},
-		.scale = 1
+		.scale = 10
 	};
 	
 	mlx_t *mlx = mlx_init(WIDTH, HEIGHT, argv[0], true);

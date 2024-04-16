@@ -21,11 +21,22 @@ void dda(mlx_image_t *image, t_dot dot[2])
 	delta[0] /= step;
 	delta[1] /= step;
 
+	short dot_rgb[2][3] = {
+		{ dot[0].color >> 16 & 0xFF, dot[0].color >> 8 & 0xFF, dot[0].color & 0xFF },
+		{ dot[1].color >> 16 & 0xFF, dot[1].color >> 8 & 0xFF, dot[1].color & 0xFF }
+	};
+
 	double tmp[2] = { dot[1].position[0], dot[1].position[1] };
 	for (float current = 0; current <= step; current++)
 	{
+		short rgb[3] = {
+			dot_rgb[1][0] + (dot_rgb[0][0] - dot_rgb[1][0]) * current / step,
+			dot_rgb[1][1] + (dot_rgb[0][1] - dot_rgb[1][1]) * current / step,
+			dot_rgb[1][2] + (dot_rgb[0][2] - dot_rgb[1][2]) * current / step
+		};
+
 		if (tmp[0] >= 0 && tmp[0] < image->width && tmp[1] >= 0 && tmp[1] < image->height)
-			mlx_put_pixel(image, tmp[0], tmp[1], dot[0].color << 8 | 0xFF);
+			mlx_put_pixel(image, tmp[0], tmp[1], rgb[0] << 24 | rgb[1] << 16 | rgb[2] << 8 | 0xFF);
 
 		tmp[0] += delta[0];
 		tmp[1] += delta[1];

@@ -6,6 +6,24 @@
 #include <limits.h>
 #include <fcntl.h>
 
+int extract_value(char **str) {
+    int value = 0;
+    char *base = "0123456789";
+
+    for (char c = **str; 1; c = *(++*str))
+        if (c == 'x')
+            base = "0123456789abcdef";
+        else {
+            char *ptr = ft_strchr(base, c);
+            if (!ptr) break;
+
+            value *= ft_strlen(base);
+            value += ptr - base;
+        }
+
+    return value;
+}
+
 t_map load_map(char *filename) {
     int fd = open(filename, O_RDONLY);
     if (fd == -1) error(2, "Failed to open file %s\n", filename);
@@ -31,13 +49,15 @@ t_map load_map(char *filename) {
     for (size_t i = 0; i < height; i++) {
         char *data = lines[i];
         for (size_t j = 0; j < width; j++) {
-            if (!data) error(2, "Invalid map: not enough data\n");
-            
-            int height = atoi(data);
-            dots[i * width + j] = (t_dot) {height, 0xFFFFFF, {0, 0}};
-
-            data = ft_strchr(data, ' ');
             for (; data && *data == ' '; data++);
+            
+            int height = extract_value(&data);
+
+            int color = 0xFFFFFF;
+            if (*data++ == ',')
+                color = extract_value(&data);
+
+            dots[i * width + j] = (t_dot) {height, color, {0, 0}};
         }
         free(lines[i]);
     }
