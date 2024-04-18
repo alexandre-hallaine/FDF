@@ -5,19 +5,20 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <fcntl.h>
+#include <string.h>
 
 int extract_value(char **str) {
     int value = 0;
     char *base = "0123456789";
 
-    for (char c = **str; 1; c = *(++*str))
+    for (char c = **str; c; c = *(++*str))
         if (c == 'x')
             base = "0123456789abcdef";
         else {
-            char *ptr = ft_strchr(base, c);
+            char *ptr = strchr(base, c);
             if (!ptr) break;
 
-            value *= ft_strlen(base);
+            value *= strlen(base);
             value += ptr - base;
         }
 
@@ -40,7 +41,7 @@ t_map load_map(char *filename) {
     }
 
     if (height == 0) error(2, "Empty file %s\n", filename);
-    for (char *data = *lines; width < USHRT_MAX && data; width++, data = ft_strchr(data, ' '))
+    for (char *data = *lines; width < USHRT_MAX && data; width++, data = strchr(data, ' '))
         for (; *data == ' '; data++);
 
     t_dot *dots = malloc(sizeof(t_dot) * (width * height));
