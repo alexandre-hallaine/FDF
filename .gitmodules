@@ -1,6 +1,0 @@
-[submodule "lib/MLX42"]
-	path = lib/MLX42
-	url = https://github.com/codam-coding-college/MLX42.git
-[submodule "lib/get_next_line"]
-	path = lib/get_next_line
-	url = https://github.com/alexandre-hallaine/get_next_line.git
