@@ -1,0 +1,17 @@
+# Build artifacts
+build/
+subprojects/*/
+
+# Object files
+*.o
+
+# Executable files
+*.out
+
+# Backup files created by editors
+*.~
+*.swp
+*.idea
+
+# macOS-specific files
+.DS_Store
