@@ -4,13 +4,16 @@
 
 ## Overview
 
-FDF brings your map data to life. Visualize terrain, landscapes, or abstract structures in a dynamic 3D wireframe environment with interactive controls.
+FDF brings your map data to life. Visualize terrain, landscapes, or abstract structures in a dynamic 3D wireframe
+environment with interactive controls.
 
-**Disclaimer**: This project serves as a learning example and does not strictly adhere to common core conventions or specific coding norms.
+**Disclaimer**: This project serves as a learning example and does not strictly adhere to common core conventions or
+specific coding norms.
 
 ## Prerequisites
 
-- [MLX42](https://github.com/codam-coding-college/MLX42) (included as a submodule; ensure its dependencies like GLFW are installed for compilation) - 
+- [MLX42](https://github.com/codam-coding-college/MLX42) (included as a submodule; ensure its dependencies like GLFW are
+  installed for compilation) -
 - get_next_line (included as a submodule)
 
 ## Instructions:
@@ -19,6 +22,7 @@ FDF brings your map data to life. Visualize terrain, landscapes, or abstract str
 3. **Run**: Execute the `fdf` program with a `map file` as the argument.
 
 Example:
+
 ```bash
 ./fdf maps/42.fdf
 ```

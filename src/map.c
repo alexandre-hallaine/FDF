@@ -33,7 +33,7 @@ t_map load_map(char *filename) {
     unsigned short height = 0;
     unsigned short width = 0;
 
-    while(height < USHRT_MAX) {
+    while (height < USHRT_MAX) {
         char *line = get_next_line(fd);
         if (line == NULL) break;
         if (*line) lines[height++] = line;
@@ -51,7 +51,7 @@ t_map load_map(char *filename) {
         char *data = lines[i];
         for (size_t j = 0; j < width; j++) {
             for (; data && *data == ' '; data++);
-            
+
             int height = extract_value(&data);
 
             int color = 0xFFFFFF;
